@@ -1,7 +1,10 @@
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn it_works() {
-        assert_eq!(2 + 2, 4);
-    }
-}
+#![crate_type = "lib"]
+
+/// The traits defined by this crate.
+mod traits;
+
+/// The dot structure.
+mod dot;
+
+/// Re-export the internal structures.
+pub use crate::{dot::Dot, traits::CmRDT, traits::CvRDT};
