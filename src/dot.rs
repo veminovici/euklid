@@ -123,6 +123,20 @@ mod utest {
     }
 
     #[quickcheck]
+    fn prop_debug(actor: String, counter: u64) -> bool {
+        let dot = Dot::new(actor.clone(), counter);
+        eprintln!("{:?}", dot);
+        true
+    }
+
+    #[quickcheck]
+    fn prop_display(actor: String, counter: u64) -> bool {
+        let dot = Dot::new(actor.clone(), counter);
+        eprintln!("{}", dot);
+        true
+    }
+
+    #[quickcheck]
     fn prop_clone_does_not_increment(dot: Dot<u8>) -> bool {
         dot.clone() == dot
     }
