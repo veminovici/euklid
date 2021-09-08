@@ -78,6 +78,31 @@ mod utest {
     use super::*;
 
     #[test]
+    fn test_display() {
+        let mut a = GCounter::new();
+        a.apply(a.inc_op("A"));
+        eprintln!("{}", a);
+    }
+
+    #[test]
+    fn test_debug() {
+        let mut a = GCounter::new();
+        a.apply(a.inc_op("A"));
+        eprintln!("{:?}", a);
+    }
+
+    #[test]
+    fn test_merge() {
+        let mut a = GCounter::new();
+        a.apply(a.inc_op("A"));
+        let mut b = GCounter::new();
+        b.apply(b.inc_op("B"));
+
+        a.merge(b);
+        assert_eq!(a.counter(), 2);
+    }
+
+    #[test]
     fn test_basic_by_one() {
         let mut a = GCounter::new();
         let mut b = GCounter::new();
