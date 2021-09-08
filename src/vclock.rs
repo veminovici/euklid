@@ -263,6 +263,22 @@ mod utest {
     }
 
     #[quickcheck]
+    fn prop_display(actor: String) -> bool {
+        let mut vclock = VClock::<String>::new();
+        vclock.apply(vclock.inc_op(actor));
+        eprintln!("{}", vclock);
+        true
+    }
+
+    #[quickcheck]
+    fn prop_debug(actor: String) -> bool {
+        let mut vclock = VClock::<String>::new();
+        vclock.apply(vclock.inc_op(actor));
+        eprintln!("{:?}", vclock);
+        true
+    }
+
+    #[quickcheck]
     fn prop_inc_op() -> bool {
         let mut vclock = VClock::new();
         let op = vclock.inc_op("A");
@@ -304,7 +320,7 @@ mod utest {
     }
 
     #[quickcheck]
-    fn prop_iter() -> bool {
+    fn prop_into_iter() -> bool {
         let mut a = VClock::new();
         a.apply(a.inc_op("A"));
 
@@ -314,5 +330,69 @@ mod utest {
         a.merge(b);
 
         a.into_iter().count() == 2
+    }
+
+    #[quickcheck]
+    fn prop_iter() -> bool {
+        let mut a = VClock::new();
+        a.apply(a.inc_op("A"));
+
+        let mut b = VClock::new();
+        b.apply(b.inc_op("B"));
+
+        a.merge(b);
+
+        a.iter().count() == 2
+    }
+
+    #[quickcheck]
+    fn prop_step() -> bool {
+        let mut a = VClock::new();
+        a.apply(a.step_op("A", 5));
+
+        a.counter_of(&"A") == 5
+    }
+
+    #[quickcheck]
+    fn prop_partial_ord_equal() -> bool {
+        let mut a = VClock::new();
+        a.apply(a.step_op("A", 5));
+
+        a.partial_cmp(&a) == Some(Ordering::Equal)
+    }
+
+    #[quickcheck]
+    fn prop_partial_ord_greater() -> bool {
+        let mut a = VClock::new();
+        a.apply(a.step_op("A", 5));
+
+        let mut b = VClock::new();
+        b.apply(b.step_op("A", 2));
+
+        a.partial_cmp(&b) == Some(Ordering::Greater)
+    }
+
+    #[quickcheck]
+    fn prop_partial_ord_less() -> bool {
+        let mut a = VClock::new();
+        a.apply(a.step_op("A", 2));
+
+        let mut b = VClock::new();
+        b.apply(b.step_op("A", 4));
+
+        a.partial_cmp(&b) == Some(Ordering::Less)
+    }
+
+    #[quickcheck]
+    fn prop_partial_ord_none() -> bool {
+        let mut a = VClock::new();
+        a.apply(a.step_op("A", 2));
+        a.apply(a.step_op("B", 4));
+
+        let mut b = VClock::new();
+        b.apply(b.step_op("A", 4));
+        b.apply(b.step_op("B", 2));
+
+        a.partial_cmp(&b) == None
     }
 }
