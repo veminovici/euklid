@@ -100,8 +100,32 @@ mod test {
     }
 
     #[quickcheck]
+    fn prop_new(actor: String, counter: u64) -> bool {
+        let dot = Dot::new(actor.clone(), counter);
+        dot.actor == actor && dot.counter == counter
+    }
+
+    #[quickcheck]
+    fn prop_clone_does_not_increment(dot: Dot<u8>) -> bool {
+        dot.clone() == dot
+    }
+
+    #[quickcheck]
     fn prop_inc_increments_only_the_counter(dot: Dot<u8>) -> bool {
         dot.inc() == Dot::new(dot.actor, dot.counter + 1)
+    }
+
+    #[quickcheck]
+    fn prop_apply_inc_increments_only_the_counter(dot: Dot<u8>) -> bool {
+        let mut dot1 = dot.clone();
+        dot1.apply_inc();
+        (dot1.actor == dot.actor) && (dot1.counter == dot.counter + 1)
+    }
+
+    #[quickcheck]
+    fn prop_from(actor: String, counter: u64) -> bool {
+        let dot = Dot::from((actor.clone(), counter));
+        dot.actor == actor && dot.counter == counter
     }
 
     #[quickcheck]
