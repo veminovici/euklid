@@ -57,6 +57,10 @@ impl<A: Ord + Clone + Debug> CvRDT for VClock<A> {
     }
 }
 
+//
+// API
+//
+
 impl<A: Ord> VClock<A> {
     /// Build a new vector clock
     pub fn new() -> Self {
@@ -87,7 +91,7 @@ impl<A: Ord> VClock<A> {
     /// use euklid::{VClock, CmRDT};
     /// let mut a = VClock::new();
     ///
-    /// // `a.inc()` does not mutate the vclock!
+    /// // `a.inc_op()` does not mutate the vclock!
     /// let op = a.inc_op("A");
     /// assert_eq!(a, VClock::new());
     ///
@@ -101,6 +105,37 @@ impl<A: Ord> VClock<A> {
         A: Clone,
     {
         self.dot_of(actor).inc()
+    }
+
+    /// Generate the Op to increase the counter for a given actor with a given value.
+    ///
+    /// # Examples
+    /// ```
+    /// use euklid::{VClock, CmRDT};
+    /// let mut a = VClock::new();
+    ///
+    /// // `a.step_op()` does not mutate the vclock!
+    /// let op = a.step_op("A", 10);
+    /// assert_eq!(a, VClock::new());
+    ///
+    /// // we must apply the op to the VClock to have
+    /// // its edit take effect.
+    /// a.apply(op.clone());
+    /// assert_eq!(a.counter_of(&"A"), 10);
+    /// ```
+    pub fn step_op(&self, actor: A, s: u64) -> Dot<A>
+    where
+        A: Clone,
+    {
+        self.dot_of(actor).step(s)
+    }
+
+    /// Returns an iterator over the dots in this vclock
+    pub fn iter(&self) -> impl Iterator<Item = Dot<&A>> {
+        self.dots.iter().map(|(a, c)| Dot {
+            actor: a,
+            counter: *c,
+        })
     }
 }
 

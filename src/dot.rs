@@ -22,10 +22,19 @@ impl<A> Dot<A> {
 }
 
 impl<A: Clone> Dot<A> {
+    /// Returns a new Dot with incremented counter
     pub fn inc(&self) -> Self {
         Self {
             actor: self.actor.clone(),
             counter: self.counter + 1,
+        }
+    }
+
+    /// Returns a new Dot with increased counter
+    pub fn step(&self, s: u64) -> Self {
+        Self {
+            actor: self.actor.clone(),
+            counter: self.counter + s,
         }
     }
 }
