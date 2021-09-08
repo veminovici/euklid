@@ -6,5 +6,8 @@ mod traits;
 /// The dot structure.
 mod dot;
 
+/// The vector clock implementation.
+mod vclock;
+
 /// Re-export the internal structures.
-pub use crate::{dot::Dot, traits::CmRDT, traits::CvRDT};
+pub use crate::{dot::Dot, traits::CmRDT, traits::CvRDT, vclock::VClock};

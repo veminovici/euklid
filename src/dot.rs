@@ -1,13 +1,13 @@
-use std::fmt;
+use std::fmt::{self, Display};
 use std::hash::{Hash, Hasher};
 
 /// The Dot is a version marker for an actor
 #[derive(Clone)]
 pub struct Dot<A> {
     /// The actor identifier
-    actor: A,
+    pub actor: A,
     /// The current version
-    counter: u64,
+    pub counter: u64,
 }
 
 impl<A> Dot<A> {
@@ -66,6 +66,14 @@ impl<A: fmt::Debug> fmt::Debug for Dot<A> {
     }
 }
 
+impl<A: Display> Display for Dot<A> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "(")?;
+        write!(f, "{}:{}", self.actor, self.counter)?;
+        write!(f, ")")
+    }
+}
+
 impl<A> From<(A, u64)> for Dot<A> {
     fn from(dot: (A, u64)) -> Self {
         let (actor, counter) = dot;
@@ -76,7 +84,7 @@ impl<A> From<(A, u64)> for Dot<A> {
 // TESTS
 
 #[cfg(test)]
-mod test {
+mod utest {
     use super::*;
     use quickcheck::{Arbitrary, Gen};
     use quickcheck_macros::quickcheck;

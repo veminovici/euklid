@@ -19,6 +19,28 @@ dot.apply_inc();
 ```
 More examples can be found in the [example](https://github.com/veminovici/euklid/blob/main/examples/dot.rs) file.
 
+<br />
+
+### Vector Clock
+The [VClock](https://github.com/veminovici/euklid/blob/main/src/vclock.rs) is implementing a vector clock.
+```rust
+extern crate euklid;
+use euklid::{Dot, VClock};
+
+// Create a vclock and increment the counter for user A.
+let mut a = VClock::new();
+
+// Increment the counter for actor A
+a.apply(a.inc_op("A"));
+
+// Increment the counter for actor B
+a.apply(a.inc_op("B"));
+```
+
+More examples can be found in the [example](https://github.com/veminovici/euklid/blob/main/examples/vclock.rs) file.
+
+<br />
+
 ### Resources
 - [A Comprehensive Study of Convergent and Commutative Replicated Data Types](https://hal.inria.fr/file/index/docid/555588/filename/techreport.pdf)
 - [John Mumm - A CRDT Primer: Defanging Order Theory](https://www.youtube.com/watch?v=OOlnp2bZVRs)
@@ -26,6 +48,7 @@ More examples can be found in the [example](https://github.com/veminovici/euklid
 - [rust-crdt](https://github.com/rust-crdt/rust-crdt)
 
 <br />
+
 
 ### Thank you!!!
 
