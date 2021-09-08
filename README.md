@@ -3,6 +3,7 @@ Rust crate for the CRDTs.
 
 [![Rust](https://github.com/veminovici/euklid/actions/workflows/rust.yml/badge.svg?branch=main)](https://github.com/veminovici/euklid/actions/workflows/rust.yml)
 [![Repo size](https://img.shields.io/github/repo-size/veminovici/euklid)](https://github.com/veminovici/euklid)
+[![Coverage Status](https://coveralls.io/repos/github/veminovici/euklid/badge.svg?branch=main)](https://coveralls.io/github/veminovici/euklid?branch=main)
 
 [![Github Actions](https://buildstats.info/github/chart/veminovici/euklid)](https://github.com/veminovici/euklid)
 
