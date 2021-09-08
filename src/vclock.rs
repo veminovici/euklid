@@ -219,6 +219,7 @@ mod utest {
     use super::*;
     use quickcheck::{Arbitrary, Gen};
     use quickcheck_macros::quickcheck;
+    use std::iter::FromIterator;
 
     impl<A: Ord + Clone + Debug + Arbitrary> Arbitrary for VClock<A> {
         fn arbitrary(g: &mut Gen) -> Self {
@@ -263,17 +264,19 @@ mod utest {
     }
 
     #[quickcheck]
-    fn prop_display(actor: String) -> bool {
-        let mut vclock = VClock::<String>::new();
-        vclock.apply(vclock.inc_op(actor));
+    fn prop_display() -> bool {
+        let mut vclock = VClock::new();
+        vclock.apply(vclock.inc_op("A"));
+        vclock.apply(vclock.step_op("B", 10));
         eprintln!("{}", vclock);
         true
     }
 
     #[quickcheck]
-    fn prop_debug(actor: String) -> bool {
-        let mut vclock = VClock::<String>::new();
-        vclock.apply(vclock.inc_op(actor));
+    fn prop_debug() -> bool {
+        let mut vclock = VClock::new();
+        vclock.apply(vclock.inc_op("A"));
+        vclock.apply(vclock.step_op("B", 10));
         eprintln!("{:?}", vclock);
         true
     }
@@ -394,5 +397,19 @@ mod utest {
         b.apply(b.step_op("B", 2));
 
         a.partial_cmp(&b) == None
+    }
+
+    #[quickcheck]
+    fn prop_from_dot() -> bool {
+        let dot = Dot::new("A", 10);
+        let vclock = VClock::from(dot);
+        vclock.counter_of(&"A") == 10
+    }
+
+    #[quickcheck]
+    fn prop_from_dots() -> bool {
+        let dots = [Dot::new("A", 10), Dot::new("B", 1)];
+        let vclock = VClock::from_iter(dots);
+        vclock.counter_of(&"A") == 10
     }
 }
