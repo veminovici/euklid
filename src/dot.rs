@@ -97,7 +97,7 @@ mod utest {
     use super::*;
     use quickcheck::{Arbitrary, Gen};
     use quickcheck_macros::quickcheck;
-    use std::cmp::Ordering;
+    use std::{cmp::Ordering, collections::hash_map::DefaultHasher};
 
     impl<A: Arbitrary + Clone> Arbitrary for Dot<A> {
         fn arbitrary(g: &mut Gen) -> Self {
@@ -120,6 +120,14 @@ mod utest {
     fn prop_new(actor: String, counter: u64) -> bool {
         let dot = Dot::new(actor.clone(), counter);
         dot.actor == actor && dot.counter == counter
+    }
+
+    #[quickcheck]
+    fn prop_hash(actor: String, counter: u64) -> bool {
+        let dot = Dot::new(actor.clone(), counter);
+        let mut hasher = DefaultHasher::new();
+        dot.hash(&mut hasher);
+        hasher.finish() != 0
     }
 
     #[quickcheck]
