@@ -1,7 +1,7 @@
 # Simplee |> Euklid
 Rust crate for the CRDTs.
 
-[![build](https://github.com/veminovici/euklid/workflows/build/badge.svg)](https://github.com/veminovici/euklid/actions?query=branch%3Amain+event%3Apush+workflow%3Arust)
+[![build](https://github.com/veminovici/euklid/actions/workflows/build.yml/badge.svg)](https://github.com/veminovici/euklid/actions/workflows/build.yml)
 [![test](https://github.com/veminovici/euklid/workflows/tests/badge.svg)](https://github.com/veminovici/euklid/actions?query=branch%3Amain+event%3Apush+workflow%3Atests)
 [![clippy](https://github.com/veminovici/euklid/workflows/clippy/badge.svg)](https://github.com/veminovici/euklid/actions?query=branch%3Amain+event%3Apush+workflow%3Aclippy)
 
