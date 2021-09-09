@@ -4,6 +4,7 @@ use std::collections::{btree_map, BTreeMap};
 
 use crate::{CmRDT, CvRDT, Dot};
 
+/// A vector clock
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct VClock<A: Ord> {
     /// dots store the map between actors and their associated counters

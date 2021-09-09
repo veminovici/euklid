@@ -16,6 +16,7 @@ impl<A> Dot<A> {
         Self { actor, counter }
     }
 
+    /// Apply an increment operation to the counter value.
     pub fn apply_inc(&mut self) {
         self.counter += 1;
     }

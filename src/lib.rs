@@ -1,4 +1,8 @@
+//! A rust library for CRDTs
+
 #![crate_type = "lib"]
+#![deny(missing_docs)]
+#![deny(unreachable_pub)]
 
 /// The traits defined by this crate.
 mod traits;

@@ -2,6 +2,7 @@ use core::fmt::{Debug, Display};
 
 use crate::{CmRDT, CvRDT, Dot, VClock};
 
+/// A grow-only counter
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct GCounter<A: Ord> {
     /// dots store the dots, one for each actor
