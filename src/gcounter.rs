@@ -52,7 +52,7 @@ impl<A: Ord + Clone + Debug> CvRDT for GCounter<A> {
 // API
 //
 
-impl<A: Ord + Clone> GCounter<A> {
+impl<A: Ord + Clone + Debug> GCounter<A> {
     /// Build a new grow-counter
     pub fn new() -> Self {
         Default::default()
@@ -64,8 +64,18 @@ impl<A: Ord + Clone> GCounter<A> {
     }
 
     /// Returns the op for increasing the counter for a given actor
-    pub fn step_op(&self, actor: A, s: u64) -> Dot<A> {
-        self.dots.step_op(actor, s)
+    pub fn step_op(&self, actor: A, step: u64) -> Dot<A> {
+        self.dots.step_op(actor, step)
+    }
+
+    /// Increment the counter value
+    pub fn inc(&mut self, actor: A) {
+        self.apply(self.inc_op(actor))
+    }
+
+    /// Increase the counter value.
+    pub fn stepup(&mut self, actor: A, step: u64) {
+        self.apply(self.step_op(actor, step))
     }
 
     /// Returns the counter value
@@ -134,5 +144,16 @@ mod utest {
 
         a.apply(a.inc_op("A"));
         assert_eq!(a.counter(), b.counter() + 1);
+    }
+
+    #[test]
+    fn test_inc_stepup() {
+        let mut a = GCounter::new();
+        let mut b = GCounter::new();
+        a.inc("A");
+        b.stepup("B", 5);
+
+        assert_eq!(a.counter(), 1);
+        assert_eq!(b.counter(), 5);
     }
 }
