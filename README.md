@@ -72,6 +72,7 @@ More examples can be found in the [example](https://github.com/veminovici/euklid
 - [Conflict Free Replicated Data Types on Wiki](https://en.wikipedia.org/wiki/Conflict-free_replicated_data_type)
 - [rust-crdt](https://github.com/rust-crdt/rust-crdt)
 - [Rust code coverage](https://eipi.xyz/blog/rust-code-coverage-with-github-workflows/)
+- [Github workflows for Rust](https://eipi.xyz/blog/github-workflows-to-do-useful-things-with-rust/)
 
 ### Thank you!!!
 
