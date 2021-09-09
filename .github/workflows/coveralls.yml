@@ -1,8 +1,8 @@
-name: clippy
+name: coverage
 on: [push, pull_request]
 
 jobs:
-  clippy:
+  coverage:
     runs-on: ubuntu-latest
     steps:
 
