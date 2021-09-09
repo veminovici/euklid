@@ -49,7 +49,7 @@ More examples can be found in the [example](https://github.com/veminovici/euklid
 
 <br/>
 
-### G-Counter
+### GCounter
 The [GCounter](https://github.com/veminovici/euklid/blob/main/src/gcounter.rs) is implementing a grow-only counter.
 ```rust
 extern crate euklid;
