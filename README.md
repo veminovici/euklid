@@ -71,6 +71,7 @@ More examples can be found in the [example](https://github.com/veminovici/euklid
 - [John Mumm - A CRDT Primer: Defanging Order Theory](https://www.youtube.com/watch?v=OOlnp2bZVRs)
 - [Conflict Free Replicated Data Types on Wiki](https://en.wikipedia.org/wiki/Conflict-free_replicated_data_type)
 - [rust-crdt](https://github.com/rust-crdt/rust-crdt)
+- [Rust code coverage](https://eipi.xyz/blog/rust-code-coverage-with-github-workflows/)
 
 ### Thank you!!!
 
