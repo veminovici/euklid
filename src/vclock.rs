@@ -273,10 +273,22 @@ mod utest {
     }
 
     #[quickcheck]
+    fn prop_vclock_display(vclock: VClock<String>) -> bool {
+        eprintln!("{}", vclock);
+        true
+    }
+
+    #[quickcheck]
     fn prop_debug() -> bool {
         let mut vclock = VClock::new();
         vclock.apply(vclock.inc_op("A"));
         vclock.apply(vclock.step_op("B", 10));
+        eprintln!("{:?}", vclock);
+        true
+    }
+
+    #[quickcheck]
+    fn prop_vclock_debug(vclock: VClock<String>) -> bool {
         eprintln!("{:?}", vclock);
         true
     }
@@ -403,7 +415,7 @@ mod utest {
     fn prop_from_dot() -> bool {
         let dot = Dot::new("A", 10);
         let vclock = VClock::from(dot);
-        vclock.counter_of(&"A") == 10
+        vclock.dot_of("A") == Dot::new("A", 10)
     }
 
     #[quickcheck]
