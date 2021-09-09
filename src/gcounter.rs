@@ -65,7 +65,7 @@ impl<A: Ord + Clone + Debug> GCounter<A> {
 
     /// Returns the op for increasing the counter for a given actor
     pub fn step_op(&self, actor: A, step: u64) -> Dot<A> {
-        self.dots.step_op(actor, step)
+        self.dots.stepup_op(actor, step)
     }
 
     /// Increment the counter value

@@ -32,10 +32,10 @@ impl<A: Clone> Dot<A> {
     }
 
     /// Returns a new Dot with increased counter
-    pub fn step(&self, s: u64) -> Self {
+    pub fn stepup(&self, step: u64) -> Self {
         Self {
             actor: self.actor.clone(),
-            counter: self.counter + s,
+            counter: self.counter + step,
         }
     }
 }

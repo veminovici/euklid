@@ -59,13 +59,13 @@ use euklid::{Dot, GCounter};
 let mut a = VGounter::new();
 
 // Increment the counter for actor A
-a.apply(a.inc_op("A"));
+a.inc("A");
 
 // Increment the counter for actor B
-a.apply(a.inc_op("B"));
+a.inc("B");
 
 // Increase the counter for actor A by 5
-a.apply(a.step_op("A", 5));
+a.stepup("A", 5);
 ```
 More examples can be found in the [example](https://github.com/veminovici/euklid/blob/main/examples/gcounter.rs) file.
 

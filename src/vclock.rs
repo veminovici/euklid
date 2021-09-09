@@ -20,6 +20,10 @@ impl<A: Ord> Default for VClock<A> {
     }
 }
 
+//
+// Display & Debug
+//
+
 impl<A: Ord + Display> Display for VClock<A> {
     /// Formats the display string
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -115,8 +119,8 @@ impl<A: Ord> VClock<A> {
     /// use euklid::{VClock, CmRDT};
     /// let mut a = VClock::new();
     ///
-    /// // `a.step_op()` does not mutate the vclock!
-    /// let op = a.step_op("A", 10);
+    /// // `a.stepup_op()` does not mutate the vclock!
+    /// let op = a.stepup_op("A", 10);
     /// assert_eq!(a, VClock::new());
     ///
     /// // we must apply the op to the VClock to have
@@ -124,11 +128,27 @@ impl<A: Ord> VClock<A> {
     /// a.apply(op.clone());
     /// assert_eq!(a.counter_of(&"A"), 10);
     /// ```
-    pub fn step_op(&self, actor: A, s: u64) -> Dot<A>
+    pub fn stepup_op(&self, actor: A, step: u64) -> Dot<A>
     where
         A: Clone,
     {
-        self.dot_of(actor).step(s)
+        self.dot_of(actor).stepup(step)
+    }
+
+    /// Increment the clock
+    pub fn inc(&mut self, actor: A)
+    where
+        A: Clone + Debug,
+    {
+        self.apply(self.inc_op(actor))
+    }
+
+    /// Increase the clock
+    pub fn stepup(&mut self, actor: A, step: u64)
+    where
+        A: Clone + Debug,
+    {
+        self.apply(self.stepup_op(actor, step))
     }
 
     /// Returns an iterator over the dots in this vclock
@@ -268,7 +288,7 @@ mod utest {
     fn prop_display() -> bool {
         let mut vclock = VClock::new();
         vclock.apply(vclock.inc_op("A"));
-        vclock.apply(vclock.step_op("B", 10));
+        vclock.apply(vclock.stepup_op("B", 10));
         eprintln!("{}", vclock);
         true
     }
@@ -283,7 +303,7 @@ mod utest {
     fn prop_debug() -> bool {
         let mut vclock = VClock::new();
         vclock.apply(vclock.inc_op("A"));
-        vclock.apply(vclock.step_op("B", 10));
+        vclock.apply(vclock.stepup_op("B", 10));
         eprintln!("{:?}", vclock);
         true
     }
@@ -300,6 +320,13 @@ mod utest {
         let op = vclock.inc_op("A");
         vclock.apply(op);
 
+        vclock.counter_of(&"A") == 1
+    }
+
+    #[quickcheck]
+    fn prop_inc() -> bool {
+        let mut vclock = VClock::new();
+        vclock.inc("A");
         vclock.counter_of(&"A") == 1
     }
 
@@ -362,17 +389,24 @@ mod utest {
     }
 
     #[quickcheck]
-    fn prop_step() -> bool {
+    fn prop_stepup_op() -> bool {
         let mut a = VClock::new();
-        a.apply(a.step_op("A", 5));
+        a.apply(a.stepup_op("A", 5));
 
+        a.counter_of(&"A") == 5
+    }
+
+    #[quickcheck]
+    fn prop_stepup() -> bool {
+        let mut a = VClock::new();
+        a.stepup("A", 5);
         a.counter_of(&"A") == 5
     }
 
     #[quickcheck]
     fn prop_partial_ord_equal() -> bool {
         let mut a = VClock::new();
-        a.apply(a.step_op("A", 5));
+        a.apply(a.stepup_op("A", 5));
 
         a.partial_cmp(&a) == Some(Ordering::Equal)
     }
@@ -380,10 +414,10 @@ mod utest {
     #[quickcheck]
     fn prop_partial_ord_greater() -> bool {
         let mut a = VClock::new();
-        a.apply(a.step_op("A", 5));
+        a.apply(a.stepup_op("A", 5));
 
         let mut b = VClock::new();
-        b.apply(b.step_op("A", 2));
+        b.apply(b.stepup_op("A", 2));
 
         a.partial_cmp(&b) == Some(Ordering::Greater)
     }
@@ -391,10 +425,10 @@ mod utest {
     #[quickcheck]
     fn prop_partial_ord_less() -> bool {
         let mut a = VClock::new();
-        a.apply(a.step_op("A", 2));
+        a.apply(a.stepup_op("A", 2));
 
         let mut b = VClock::new();
-        b.apply(b.step_op("A", 4));
+        b.apply(b.stepup_op("A", 4));
 
         a.partial_cmp(&b) == Some(Ordering::Less)
     }
@@ -402,12 +436,12 @@ mod utest {
     #[quickcheck]
     fn prop_partial_ord_none() -> bool {
         let mut a = VClock::new();
-        a.apply(a.step_op("A", 2));
-        a.apply(a.step_op("B", 4));
+        a.apply(a.stepup_op("A", 2));
+        a.apply(a.stepup_op("B", 4));
 
         let mut b = VClock::new();
-        b.apply(b.step_op("A", 4));
-        b.apply(b.step_op("B", 2));
+        b.apply(b.stepup_op("A", 4));
+        b.apply(b.stepup_op("B", 2));
 
         a.partial_cmp(&b) == None
     }
