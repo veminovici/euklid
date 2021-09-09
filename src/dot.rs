@@ -187,4 +187,11 @@ mod utest {
             _ => false,
         }
     }
+
+    #[test]
+    fn test_partial_com() {
+        let a = Dot::new("A", 10);
+        let b = Dot::new("B", 1);
+        assert_eq!(a.partial_cmp(&b), None);
+    }
 }
