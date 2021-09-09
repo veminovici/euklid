@@ -68,7 +68,7 @@ impl<A: Ord + Clone + Debug> CvRDT for PNCounter<A> {
 // API
 //
 
-impl<A: Ord + Clone> PNCounter<A> {
+impl<A: Ord + Clone + Debug> PNCounter<A> {
     /// Builds a new pncounter
     pub fn new() -> Self {
         Default::default()
@@ -92,6 +92,26 @@ impl<A: Ord + Clone> PNCounter<A> {
     /// Create a decrease operation
     pub fn stepdown_op(&self, actor: A, step: u64) -> Op<A> {
         Op::Decrement(self.n.step_op(actor, step))
+    }
+
+    /// Increment the value of the counter
+    pub fn inc(&mut self, actor: A) {
+        self.apply(self.inc_op(actor))
+    }
+
+    /// Decrement the value of the counter
+    pub fn decr(&mut self, actor: A) {
+        self.apply(self.decr_op(actor))
+    }
+
+    /// Increases the vlaue of the counter
+    pub fn step_up(&mut self, actor: A, step: u64) {
+        self.apply(self.stepup_op(actor, step))
+    }
+
+    /// Decreases the value of the counter
+    pub fn step_down(&mut self, actor: A, step: u64) {
+        self.apply(self.stepdown_op(actor, step))
     }
 
     /// Get the counter value
@@ -154,4 +174,14 @@ mod utest {
         assert_eq!(a.counter(), 6);
     }
 
+    #[test]
+    fn test_inc_decr_step_up_down() {
+        let mut a = PNCounter::new();
+        a.inc("A");
+        a.step_up("A", 5);
+        a.decr("A");
+        a.step_down("A", 2);
+
+        assert_eq!(a.counter(), 3);
+    }
 }

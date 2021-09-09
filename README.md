@@ -81,16 +81,16 @@ use euklid::{PNCounter};
 let mut a = PNCounter::new();
 
 // Increment the counter value
-a.apply(a.inc_op("A"));
+a.inc("A");
 
 // Increase the counter value by 5.
-a.apply(a.stepup_op("A", 5));
+a.step_up("A", 5));
 
 // Decrement the value
-a.apply(a.decr_op("A"));
+a.decr("A");
 
 // Decrease the counter value by 2
-a.apply(a.stepdown_op("A", 2));
+a.step_down("A", 2);
 
 // The counter value should be 3 by now.
 assert_eq!(a.counter(), 3);
