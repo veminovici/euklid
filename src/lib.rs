@@ -16,5 +16,11 @@ mod vclock;
 /// The grow-counter implementation.
 mod gcounter;
 
+/// The pncounter implementation.
+mod pncounter;
+
 /// Re-export the internal structures.
-pub use crate::{dot::Dot, gcounter::GCounter, traits::CmRDT, traits::CvRDT, vclock::VClock};
+pub use crate::{
+    dot::Dot, gcounter::GCounter, pncounter::Op, pncounter::PNCounter, traits::CmRDT,
+    traits::CvRDT, vclock::VClock,
+};

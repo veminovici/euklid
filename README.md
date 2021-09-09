@@ -52,7 +52,7 @@ More examples can be found in the [example](https://github.com/veminovici/euklid
 ### G-Counter
 The [GCounter](https://github.com/veminovici/euklid/blob/main/src/gcounter.rs) is implementing a grow-only counter.
 ```rust
-xtern crate euklid;
+extern crate euklid;
 use euklid::{Dot, GCounter};
 
 // Create a vclock and increment the counter for user A.
@@ -68,6 +68,34 @@ a.apply(a.inc_op("B"));
 a.apply(a.step_op("A", 5));
 ```
 More examples can be found in the [example](https://github.com/veminovici/euklid/blob/main/examples/gcounter.rs) file.
+
+<br/>
+
+### PNCounter
+The [PNCounter](https://github.com/veminovici/euklid/blob/main/src/pncounter.rs) is implementing a pn-counter.
+```rust
+extern create euklid;
+use euklid::{PNCounter};
+
+// Build a new pncounter
+let mut a = PNCounter::new();
+
+// Increment the counter value
+a.apply(a.inc_op("A"));
+
+// Increase the counter value by 5.
+a.apply(a.stepup_op("A", 5));
+
+// Decrement the value
+a.apply(a.decr_op("A"));
+
+// Decrease the counter value by 2
+a.apply(a.stepdown_op("A", 2));
+
+// The counter value should be 3 by now.
+assert_eq!(a.counter(), 3);
+```
+More examples can be found in the [example](https://github.com/veminovici/euklid/blob/main/examples/pncounter.rs) file.
 
 <br/>
 

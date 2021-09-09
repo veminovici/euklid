@@ -17,6 +17,10 @@ impl<A: Ord> Default for GCounter<A> {
     }
 }
 
+//
+// Display, debug
+//
+
 impl<A: Ord + Display> Display for GCounter<A> {
     /// Formats the display string
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
