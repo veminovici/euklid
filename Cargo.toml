@@ -9,6 +9,7 @@ repository = "https://github.com/veminovici/euklid"
 documentation = "https://docs.rs/euklid"
 keywords = ["crdt", "data-structures", "distributed-systems", "vector-clock"]
 edition = "2018"
+readme = "README.md"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
