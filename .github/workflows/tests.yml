@@ -1,8 +1,8 @@
-name: CI Tests
+name: tests
 on: [push, pull_request]
 
 jobs:
-  Tests:
+  tests:
     runs-on: ubuntu-latest
     steps:
 
