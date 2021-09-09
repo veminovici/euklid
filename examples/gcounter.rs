@@ -14,7 +14,8 @@ fn main() {
     gcounter1.merge(gcounter2);
     eprintln!("gcounter merged: {:?}", gcounter1);
 
-    gcounter1.stepup("A", 3);
+    gcounter1.step_up("A", 3);
     gcounter1.inc("B");
     eprintln!("gcounter updated: {:?}", gcounter1);
+    eprintln!("counter={}", gcounter1.counter());
 }

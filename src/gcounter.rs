@@ -74,7 +74,7 @@ impl<A: Ord + Clone + Debug> GCounter<A> {
     }
 
     /// Increase the counter value.
-    pub fn stepup(&mut self, actor: A, step: u64) {
+    pub fn step_up(&mut self, actor: A, step: u64) {
         self.apply(self.step_op(actor, step))
     }
 
@@ -147,11 +147,11 @@ mod utest {
     }
 
     #[test]
-    fn test_inc_stepup() {
+    fn test_inc_step_up() {
         let mut a = GCounter::new();
         let mut b = GCounter::new();
         a.inc("A");
-        b.stepup("B", 5);
+        b.step_up("B", 5);
 
         assert_eq!(a.counter(), 1);
         assert_eq!(b.counter(), 5);
