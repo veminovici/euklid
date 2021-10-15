@@ -25,6 +25,29 @@ impl<A> Dot<A> {
     pub fn apply_inc_op(&mut self) {
         self.counter += 1;
     }
+
+    /// Applies to the current dot an increment with a given value.
+    pub fn apply_stepup_op(&mut self, step: u64) {
+        self.counter += step;
+    }
+}
+
+impl<A: Clone> Dot<A> {
+    /// Returns a new Dot with incremented counter
+    pub fn inc(&self) -> Self {
+        Self {
+            actor: self.actor.clone(),
+            counter: self.counter + 1,
+        }
+    }
+
+    /// Returns a new Dot with increased counter
+    pub fn stepup(&self, step: u64) -> Self {
+        Self {
+            actor: self.actor.clone(),
+            counter: self.counter + step,
+        }
+    }
 }
 
 impl<A: PartialEq> PartialEq for Dot<A> {
@@ -62,6 +85,8 @@ impl<A> From<(A, u64)> for Dot<A> {
 mod tests {
     use super::*;
     use quickcheck::{Arbitrary, Gen};
+    use quickcheck_macros::quickcheck;
+    use std::{cmp::Ordering, collections::hash_map::DefaultHasher, hash::Hasher};
 
     impl<A: Arbitrary + Clone> Arbitrary for Dot<A> {
         fn arbitrary(g: &mut Gen) -> Self {
@@ -80,10 +105,97 @@ mod tests {
         }
     }
 
-    #[test]
-    fn test_dot_new() {
-        let dot = Dot::new(1234, 1);
-        assert_eq!(1234, dot.actor);
-        assert_eq!(1, dot.counter);
+    #[quickcheck]
+    fn test_new(actor: i32, counter: u64) -> bool {
+        let dot = Dot::new(actor, counter);
+        assert_eq!(actor, dot.actor);
+        assert_eq!(counter, dot.counter);
+        true
+    }
+
+    #[quickcheck]
+    fn test_debug(dot: Dot<i32>) -> bool {
+        let s = format!("{:?}", dot);
+        assert!(!s.is_empty());
+        true
+    }
+
+    #[quickcheck]
+    fn test_clone(dot: Dot<i32>) -> bool {
+        let dot1 = dot;
+        assert_eq!(dot, dot1);
+        true
+    }
+
+    #[quickcheck]
+    fn test_eq_diff_counter(actor: i32, counter: u32) -> bool {
+        let dot = Dot::new(actor, counter as u64);
+        let dot1 = Dot::new(actor, (counter as u64) + 1);
+        assert!(!dot.eq(&dot1));
+        true
+    }
+
+    #[quickcheck]
+    fn test_eq_diff_actor(actor: i32, counter: u64) -> bool {
+        let dot = Dot::new(actor as i64, counter);
+        let dot1 = Dot::new((actor as i64) + 1, counter);
+        assert!(!dot.eq(&dot1));
+        true
+    }
+
+    #[quickcheck]
+    fn test_pord_counter(actor: i32, counter: u32) -> bool {
+        let dot = Dot::new(actor, counter as u64);
+        let dot1 = Dot::new(actor, (counter as u64) + 1);
+        assert_eq!(Some(Ordering::Less), dot.partial_cmp(&dot1));
+        true
+    }
+
+    #[quickcheck]
+    fn test_pord_diff_actor(actor: i16, counter: u64) -> bool {
+        let dot = Dot::new(actor as i32, counter);
+        let dot1 = Dot::new((actor as i32) + 1, counter);
+        dot.partial_cmp(&dot1).is_none()
+    }
+
+    #[quickcheck]
+    fn test_hash(dot: Dot<i32>) -> bool {
+        let mut hasher = DefaultHasher::new();
+        dot.hash(&mut hasher);
+        hasher.finish() != 0
+    }
+
+    #[quickcheck]
+    fn test_from(actor: i32, counter: u64) -> bool {
+        let dot: Dot<i32> = (actor, counter).into();
+        dot.actor == actor && dot.counter == counter
+    }
+
+    #[quickcheck]
+    fn test_apply_inc_op(actor: i32, counter: u32) -> bool {
+        let mut dot = Dot::new(actor, counter as u64);
+        dot.apply_inc_op();
+        dot.actor == actor && dot.counter == (counter as u64) + 1
+    }
+
+    #[quickcheck]
+    fn test_apply_stepup_op(actor: i32, counter: u16, step: u16) -> bool {
+        let mut dot = Dot::new(actor, counter as u64);
+        dot.apply_stepup_op(step as u64);
+        dot.actor == actor && dot.counter == (counter as u64) + (step as u64)
+    }
+
+    #[quickcheck]
+    fn test_inc(actor: i32, counter: u32) -> bool {
+        let dot = Dot::new(actor, counter as u64);
+        let dot1 = dot.inc();
+        dot1.actor == actor && dot1.counter == (counter as u64) + 1
+    }
+
+    #[quickcheck]
+    fn test_stepup(actor: i32, counter: u16, step: u16) -> bool {
+        let dot = Dot::new(actor, counter as u64);
+        let dot1 = dot.stepup(step as u64);
+        dot1.actor == actor && dot1.counter == (counter as u64) + (step as u64)
     }
 }
