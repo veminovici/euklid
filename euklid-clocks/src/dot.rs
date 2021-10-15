@@ -98,11 +98,27 @@ mod tests {
 
         fn shrink(&self) -> Box<dyn Iterator<Item = Self>> {
             let mut shrunk_dots = Vec::new();
-            if self.counter > 0 {
-                shrunk_dots.push(Self::new(self.actor.clone(), self.counter - 1));
+            let mut counter = self.counter;
+            loop {
+                shrunk_dots.push(Self::new(self.actor.clone(), counter));
+                if counter == 0 {
+                    break;
+                }
+
+                counter -= 1;
             }
+
             Box::new(shrunk_dots.into_iter())
         }
+    }
+
+    #[quickcheck]
+    fn test_shrink(actor: i32, counter: usize) -> bool {
+        let counter = counter % 10;
+        let dot = Dot::new(actor, counter as u64);
+        let xs = dot.shrink();
+        assert_eq!(counter + 1, xs.count());
+        true
     }
 
     #[quickcheck]
