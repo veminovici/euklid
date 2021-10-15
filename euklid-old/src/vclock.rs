@@ -93,7 +93,7 @@ impl<A: Ord> VClock<A> {
     ///
     /// # Examples
     /// ```
-    /// use euklid::{VClock, CmRDT};
+    /// use euklid_old::{VClock, CmRDT};
     /// let mut a = VClock::new();
     ///
     /// // `a.inc_op()` does not mutate the vclock!
@@ -116,7 +116,7 @@ impl<A: Ord> VClock<A> {
     ///
     /// # Examples
     /// ```
-    /// use euklid::{VClock, CmRDT};
+    /// use euklid_old::{VClock, CmRDT};
     /// let mut a = VClock::new();
     ///
     /// // `a.stepup_op()` does not mutate the vclock!

@@ -1,6 +1,6 @@
-extern crate euklid;
+extern crate euklid_old;
 
-use euklid::{CmRDT, CvRDT, PNCounter};
+use euklid_old::{CmRDT, CvRDT, PNCounter};
 
 fn main() {
     let mut pncounter1 = PNCounter::new();

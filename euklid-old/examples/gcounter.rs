@@ -1,6 +1,6 @@
-extern crate euklid;
+extern crate euklid_old;
 
-use euklid::{CmRDT, CvRDT, GCounter};
+use euklid_old::{CmRDT, CvRDT, GCounter};
 
 fn main() {
     let mut gcounter1 = GCounter::new();

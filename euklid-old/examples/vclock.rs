@@ -1,6 +1,6 @@
-extern crate euklid;
+extern crate euklid_old;
 
-use euklid::{CmRDT, CvRDT, VClock};
+use euklid_old::{CmRDT, CvRDT, VClock};
 
 fn main() {
     let mut vclock1 = VClock::new();

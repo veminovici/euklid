@@ -1,6 +1,6 @@
-extern crate euklid;
+extern crate euklid_old;
 
-use euklid::Dot;
+use euklid_old::Dot;
 
 fn main() {
     // Create a dot for the actor Alice.
