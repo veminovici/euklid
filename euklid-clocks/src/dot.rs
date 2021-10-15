@@ -11,7 +11,7 @@ pub struct Dot<A> {
 
 impl<A: Debug> Debug for Dot<A> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        writeln!(f, "{:?}:{}", self.actor, self.counter)
+        write!(f, "{:?}:{}", self.actor, self.counter)
     }
 }
 
