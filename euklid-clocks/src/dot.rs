@@ -5,8 +5,10 @@ use std::hash::Hash;
 /// A structure for the counter attached to an actor
 #[derive(Clone, Copy)]
 pub struct Dot<A> {
-    actor: A,
-    counter: u64,
+    /// The actor
+    pub actor: A,
+    /// The counter
+    pub counter: u64,
 }
 
 impl<A: Debug> Debug for Dot<A> {
