@@ -178,15 +178,43 @@ mod tests {
 
     #[test]
     fn test_debug() {
-        let vc: Vec<i32> = [1, 2, 3].into();
+        let vc = VClock::<i32>::from_iter([1, 2, 3]);
         let s = format!("{:?}", vc);
         assert!(!s.is_empty());
     }
 
     #[test]
     fn test_eq() {
-        let xs: Vec<i32> = [1, 2, 3].into();
-        let ys: Vec<i32> = [1, 2, 3].into();
+        let xs = VClock::<i32>::from_iter([1, 2, 3]);
+        let ys = VClock::<i32>::from_iter([1, 2, 3]);
         assert!(xs.eq(&ys));
+    }
+
+    #[test]
+    fn test_pord_eq() {
+        let xs = VClock::<i32>::from_iter([1, 2, 3]);
+        let ys = VClock::<i32>::from_iter([1, 2, 3]);
+        assert_eq!(Some(Ordering::Equal), xs.partial_cmp(&ys));
+    }
+
+    #[test]
+    fn test_default() {
+        let v = VClock::<i32>::default();
+        assert!(v.is_empty());
+        assert_eq!(0, v.len());
+    }
+
+    #[test]
+    fn test_dot() {
+        let xs = VClock::<i32>::from_iter([1, 2, 3]);
+        let d = xs.dot(&1);
+        assert_eq!(1, d.actor);
+        assert_eq!(0, d.counter);
+    }
+
+    #[test]
+    fn test_iter() {
+        let xs = VClock::<i32>::from_iter([1, 2, 3]);
+        assert_eq!(3, xs.iter().count());
     }
 }
