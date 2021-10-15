@@ -155,11 +155,38 @@ impl<A: Ord> FromIterator<A> for VClock<A> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use quickcheck_macros::quickcheck;
 
     #[test]
     fn test_new() {
         let vc = VClock::<i32>::default();
         assert!(vc.is_empty());
         assert_eq!(0, vc.len());
+    }
+
+    #[quickcheck]
+    fn test_from_iter(len: usize) -> bool {
+        let len = len % 100;
+        let mut actors = Vec::new();
+        for i in 0..len {
+            actors.push(i as i32);
+        }
+
+        let vc = VClock::<i32>::from_iter(actors);
+        vc.len() == len
+    }
+
+    #[test]
+    fn test_debug() {
+        let vc: Vec<i32> = [1, 2, 3].into();
+        let s = format!("{:?}", vc);
+        assert!(!s.is_empty());
+    }
+
+    #[test]
+    fn test_eq() {
+        let xs: Vec<i32> = [1, 2, 3].into();
+        let ys: Vec<i32> = [1, 2, 3].into();
+        assert!(xs.eq(&ys));
     }
 }

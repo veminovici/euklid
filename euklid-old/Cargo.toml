@@ -19,5 +19,5 @@ readme = "README.md"
 quickcheck = "1.0"
 quickcheck_macros = "1.0"
 
-[profile.release]
-debug = true
+# [profile.release]
+# debug = true
