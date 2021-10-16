@@ -172,6 +172,9 @@ More examples can be found in the [example](https://github.com/veminovici/euklid
 ### Resources
 - [Vector Clocks Revisited](https://riak.com/posts/technical/vector-clocks-revisited/index.html?p=9545.html)
 - [Vector Clocks Revisited Part2: Dotted Version Vectors](https://riak.com/posts/technical/vector-clocks-revisited-part-2-dotted-version-vectors/index.html)
+- [Version Vector](https://martinfowler.com/articles/patterns-of-distributed-systems/version-vector.html#:~:text=Dotted%20version%20vectors%20One%20of%20the%20major%20problems,time.%20The%20problem%20is%20called%20as%20sibling%20explosion.)
+- [A Brief History of Time in Raik](https://speakerdeck.com/seancribbs/a-brief-history-of-time-in-riak)
+- [Scalable and Accurate Causality Tracking for Eventual Consistent Stores](https://haslab.uminho.pt/tome/files/dvvset-dais.pdf)
 - [A Comprehensive Study of Convergent and Commutative Replicated Data Types](https://hal.inria.fr/file/index/docid/555588/filename/techreport.pdf)
 - [John Mumm - A CRDT Primer: Defanging Order Theory](https://www.youtube.com/watch?v=OOlnp2bZVRs)
 - [Conflict Free Replicated Data Types on Wiki](https://en.wikipedia.org/wiki/Conflict-free_replicated_data_type)
