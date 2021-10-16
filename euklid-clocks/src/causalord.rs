@@ -47,4 +47,3 @@ pub trait CausalOrd: PartialOrd<Self> {
         matches!(self.causal_cmp(other), CausalOrdering::Concurrent)
     }
 }
-

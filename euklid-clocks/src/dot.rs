@@ -63,10 +63,20 @@ impl<A: PartialOrd> PartialOrd for Dot<A> {
 
 impl<A: PartialOrd> CausalOrd for Dot<A> {}
 
+//
+// Froms
+//
+
 impl<A> From<(A, u64)> for Dot<A> {
-    fn from(dot_material: (A, u64)) -> Self {
-        let (actor, counter) = dot_material;
+    fn from(pair: (A, u64)) -> Self {
+        let (actor, counter) = pair;
         Self { actor, counter }
+    }
+}
+
+impl<A> From<A> for Dot<A> {
+    fn from(actor: A) -> Self {
+        Self { actor, counter: 0 }
     }
 }
 
@@ -200,9 +210,15 @@ mod tests {
     }
 
     #[quickcheck]
-    fn test_from(actor: i32, counter: u64) -> bool {
+    fn test_from_pair(actor: i32, counter: u64) -> bool {
         let dot: Dot<i32> = (actor, counter).into();
         dot.actor == actor && dot.counter == counter
+    }
+
+    #[quickcheck]
+    fn test_from_actor(actor: i32) -> bool {
+        let dot: Dot<i32> = actor.into();
+        dot.actor == actor && dot.counter == 0
     }
 
     #[quickcheck]
