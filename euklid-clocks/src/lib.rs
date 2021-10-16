@@ -3,6 +3,7 @@
 #![deny(missing_docs)]
 #![deny(unreachable_pub)]
 
+mod causalord;
 mod dot;
 mod vclock;
 

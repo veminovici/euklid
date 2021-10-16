@@ -1,20 +1,15 @@
+use super::CausalOrd;
+
 use std::cmp::Ordering;
 use std::fmt::Debug;
-use std::hash::Hash;
 
-/// A structure for the counter attached to an actor
+/// The dot structure pairs an actor with a counter.
 #[derive(Clone, Copy)]
 pub struct Dot<A> {
-    /// The actor
+    /// The actor identifier
     pub actor: A,
-    /// The counter
+    /// The current counter value
     pub counter: u64,
-}
-
-impl<A: Debug> Debug for Dot<A> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{:?}:{}", self.actor, self.counter)
-    }
 }
 
 impl<A> Dot<A> {
@@ -27,10 +22,11 @@ impl<A> Dot<A> {
     pub fn apply_inc_op(&mut self) {
         self.counter += 1;
     }
+}
 
-    /// Applies to the current dot an increment with a given value.
-    pub fn apply_stepup_op(&mut self, step: u64) {
-        self.counter += step;
+impl<A: Debug> Debug for Dot<A> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{:?}:{}", self.actor, self.counter)
     }
 }
 
@@ -42,15 +38,11 @@ impl<A: Clone> Dot<A> {
             counter: self.counter + 1,
         }
     }
-
-    /// Returns a new Dot with increased counter
-    pub fn stepup(&self, step: u64) -> Self {
-        Self {
-            actor: self.actor.clone(),
-            counter: self.counter + step,
-        }
-    }
 }
+
+//
+// Causal ordering
+//
 
 impl<A: PartialEq> PartialEq for Dot<A> {
     fn eq(&self, other: &Self) -> bool {
@@ -69,12 +61,7 @@ impl<A: PartialOrd> PartialOrd for Dot<A> {
     }
 }
 
-impl<A: Hash> Hash for Dot<A> {
-    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
-        self.actor.hash(state);
-        self.counter.hash(state);
-    }
-}
+impl<A: PartialOrd> CausalOrd for Dot<A> {}
 
 impl<A> From<(A, u64)> for Dot<A> {
     fn from(dot_material: (A, u64)) -> Self {
@@ -85,10 +72,12 @@ impl<A> From<(A, u64)> for Dot<A> {
 
 #[cfg(test)]
 mod tests {
+    use crate::CausalOrdering;
+
     use super::*;
     use quickcheck::{Arbitrary, Gen};
     use quickcheck_macros::quickcheck;
-    use std::{cmp::Ordering, collections::hash_map::DefaultHasher, hash::Hasher};
+    use std::cmp::Ordering;
 
     impl<A: Arbitrary + Clone> Arbitrary for Dot<A> {
         fn arbitrary(g: &mut Gen) -> Self {
@@ -177,10 +166,37 @@ mod tests {
     }
 
     #[quickcheck]
-    fn test_hash(dot: Dot<i32>) -> bool {
-        let mut hasher = DefaultHasher::new();
-        dot.hash(&mut hasher);
-        hasher.finish() != 0
+    fn test_cmp_precedes(actor: i32, counter: u32) -> bool {
+        let dot = Dot::new(actor, counter as u64);
+        let dot1 = Dot::new(actor, (counter as u64) + 1);
+        matches!(dot.causal_cmp(&dot1), CausalOrdering::Precede)
+    }
+
+    #[quickcheck]
+    fn test_descents_eq(actor: i32, counter: u32) -> bool {
+        let dot = Dot::new(actor, counter as u64);
+        dot.descends(&dot)
+    }
+
+    #[quickcheck]
+    fn test_descents_succ(actor: i32, counter: u32) -> bool {
+        let dot = Dot::new(actor, counter as u64);
+        let dot1 = Dot::new(actor, (counter as u64) + 1);
+        dot1.descends(&dot)
+    }
+
+    #[quickcheck]
+    fn test_dominates(actor: i32, counter: u32) -> bool {
+        let dot = Dot::new(actor, counter as u64);
+        let dot1 = Dot::new(actor, (counter as u64) + 1);
+        dot1.dominates(&dot)
+    }
+
+    #[quickcheck]
+    fn test_concurrent(actor: i16, counter: u64) -> bool {
+        let a = Dot::new(actor as i32, counter);
+        let b = Dot::new((actor as i32) + 1, counter);
+        b.concurrent(&a)
     }
 
     #[quickcheck]
@@ -197,23 +213,9 @@ mod tests {
     }
 
     #[quickcheck]
-    fn test_apply_stepup_op(actor: i32, counter: u16, step: u16) -> bool {
-        let mut dot = Dot::new(actor, counter as u64);
-        dot.apply_stepup_op(step as u64);
-        dot.actor == actor && dot.counter == (counter as u64) + (step as u64)
-    }
-
-    #[quickcheck]
     fn test_inc(actor: i32, counter: u32) -> bool {
         let dot = Dot::new(actor, counter as u64);
         let dot1 = dot.inc();
         dot1.actor == actor && dot1.counter == (counter as u64) + 1
-    }
-
-    #[quickcheck]
-    fn test_stepup(actor: i32, counter: u16, step: u16) -> bool {
-        let dot = Dot::new(actor, counter as u64);
-        let dot1 = dot.stepup(step as u64);
-        dot1.actor == actor && dot1.counter == (counter as u64) + (step as u64)
     }
 }
