@@ -13,6 +13,44 @@ Just another rust crate, this one implements CRDTs things.
 
 <br/>
 
+### Causality
+The crate defines the **CausalOrdering** enumeration which has 4 values:
+
+```rust
+pub enum CausalOrdering {
+    /// A causal ordering where a compared dot precedes another.
+    Precede,
+    /// A causal ordering where a compared dot is equal to another.
+    Equal,
+    /// A causal ordering where a compared dot succeeds another.
+    Succeed,
+    /// A causal ordering where a compared dot is concurrent to another.
+    Concurrent,
+}
+```
+
+The crate also defines **CausalOrd** trait which along with the **CasualOrdering** allows the caller
+to determine if there is any causality between two different instances of the **CausalOrd**. The trait defines
+
+```rust
+pub trait CausalOrd: PartialOrd<Self> {
+    /// This method returns a causal ordering between `self` and `other` values if one exists.
+    fn causal_cmp(&self, other: &Self) -> CausalOrdering;
+
+    /// This method tests succeed (for `self` and `other`)
+    fn dominates(&self, other: &Self) -> bool;
+
+    /// This method tests succeed and identical (for `self` and `other`)
+    fn descends(&self, other: &Self) -> bool ;
+
+    /// This method tests concurrent (for `self` and `other`)
+    fn concurrent(&self, other: &Self) -> bool;
+}
+```
+
+If a structure implements the **std::cmn::PartialOrd**, you can implement the **CausalOrd**. You dont have to impement any of its
+functions, since all of them have default implementations.
+
 ### Dot
 The [Dot](https://github.com/veminovici/euklid/blob/main/euklid-clocks/src/dot.rs) is implementing a dot for clocks.
 ```rust
