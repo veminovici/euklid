@@ -24,5 +24,6 @@ pub trait CvRDT {
     fn merge(&mut self, other: Self);
 }
 
+pub use crate::causalord::*;
 pub use crate::dot::Dot;
 pub use crate::vclock::*;
