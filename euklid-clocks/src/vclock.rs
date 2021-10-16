@@ -1,3 +1,5 @@
+use crate::CausalOrd;
+
 use super::{CmRDT, CvRDT, Dot};
 use std::{
     cmp::Ordering,
@@ -23,16 +25,19 @@ impl<A: Ord> Default for VClock<A> {
 impl<A: Ord + Debug> Debug for VClock<A> {
     /// Formats the display string
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "<")?;
-        for (i, (actor, count)) in self.dots.iter().enumerate() {
-            if i > 0 {
-                write!(f, ", ")?;
-            }
-            write!(f, "{:?}:{}", actor, count)?;
-        }
-        write!(f, ">")
+        let xs = self
+            .dots
+            .iter()
+            .map(|(a, c)| format!("{:?}:{}", a, c))
+            .collect::<Vec<String>>()
+            .join(", ");
+        write!(f, "<{}>", xs)
     }
 }
+
+//
+// Causal order
+//
 
 impl<A: Ord> PartialEq for VClock<A> {
     fn eq(&self, other: &Self) -> bool {
@@ -53,6 +58,8 @@ impl<A: Ord> PartialOrd for VClock<A> {
         }
     }
 }
+
+impl<A: Ord> CausalOrd for VClock<A> {}
 
 impl<A: Ord> VClock<A> {
     /// Creates a new instance of a ['VClock']
@@ -93,6 +100,10 @@ impl<A: Ord + Copy> VClock<A> {
     }
 }
 
+//
+// CRDT
+//
+
 impl<A: Ord> CvRDT for VClock<A> {
     fn merge(&mut self, other: Self) {
         // Merge each other dot into the current vector clock
@@ -112,6 +123,10 @@ impl<A: Ord> CmRDT for VClock<A> {
         }
     }
 }
+
+//
+// Iterators
+//
 
 /// Helper structure to generate an iterator based on the content of the vector clock.
 pub struct IntoIter<A: Ord> {
