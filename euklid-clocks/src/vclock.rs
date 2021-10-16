@@ -6,6 +6,7 @@ use std::{
     collections::{btree_map, BTreeMap},
     fmt::Debug,
     iter::FromIterator,
+    ops::{AddAssign, BitOrAssign},
 };
 
 /// A vector clock.
@@ -22,16 +23,49 @@ impl<A: Ord> Default for VClock<A> {
     }
 }
 
-impl<A: Ord + Debug> Debug for VClock<A> {
-    /// Formats the display string
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let xs = self
-            .dots
-            .iter()
-            .map(|(a, c)| format!("{:?}:{}", a, c))
-            .collect::<Vec<String>>()
-            .join(", ");
-        write!(f, "<{}>", xs)
+//
+// Public functionality
+//
+
+impl<A: Ord> VClock<A> {
+    /// Creates a new instance of a ['VClock']
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    /// Returns true if there are no dots in the vector
+    pub fn is_empty(&self) -> bool {
+        self.dots.is_empty()
+    }
+
+    /// Returns the number of dots stored in the vector
+    pub fn len(&self) -> usize {
+        self.dots.len()
+    }
+
+    /// Returns the counter for a given actor. If the actor
+    /// is not stored in the vector, it returns 0.
+    pub(crate) fn counter(&self, actor: &A) -> u64 {
+        self.dots.get(actor).cloned().unwrap_or(0)
+    }
+}
+
+impl<A: Ord + Clone> VClock<A> {
+    /// Returns the dot for the given actor.
+    pub fn dot(&self, actor: &A) -> Dot<A> {
+        let counter = self.counter(actor);
+        Dot {
+            actor: actor.clone(),
+            counter,
+        }
+    }
+
+    /// Returns an iterator over the dots in this vclock
+    pub fn iter(&self) -> impl Iterator<Item = Dot<A>> + '_ {
+        self.dots.iter().map(|(a, c)| Dot {
+            actor: a.clone(),
+            counter: *c,
+        })
     }
 }
 
@@ -61,45 +95,6 @@ impl<A: Ord> PartialOrd for VClock<A> {
 
 impl<A: Ord> CausalOrd for VClock<A> {}
 
-impl<A: Ord> VClock<A> {
-    /// Creates a new instance of a ['VClock']
-    pub fn new() -> Self {
-        Self::default()
-    }
-
-    /// Returns true if there are no dots in the vector
-    pub fn is_empty(&self) -> bool {
-        self.dots.is_empty()
-    }
-
-    /// Returns the number of dots stored in the vector
-    pub fn len(&self) -> usize {
-        self.dots.len()
-    }
-
-    /// Returns the counter for a given actor. If the actor
-    /// is not stored in the vector, it returns 0.
-    pub(crate) fn counter(&self, actor: &A) -> u64 {
-        self.dots.get(actor).cloned().unwrap_or(0)
-    }
-}
-
-impl<A: Ord + Copy> VClock<A> {
-    /// Returns the dot for the given actor.
-    pub fn dot(&self, actor: &A) -> Dot<A> {
-        let counter = self.counter(actor);
-        Dot::new(*actor, counter)
-    }
-
-    /// Returns an iterator over the dots in this vclock
-    pub fn iter(&self) -> impl Iterator<Item = Dot<A>> + '_ {
-        self.dots.iter().map(|(a, c)| Dot {
-            actor: *a,
-            counter: *c,
-        })
-    }
-}
-
 //
 // CRDT
 //
@@ -121,6 +116,28 @@ impl<A: Ord> CmRDT for VClock<A> {
         if self.counter(&op.actor) < op.counter {
             self.dots.insert(op.actor, op.counter);
         }
+    }
+}
+
+//
+// Operations
+//
+
+impl<A: Ord> AddAssign<Dot<A>> for VClock<A> {
+    fn add_assign(&mut self, rhs: Dot<A>) {
+        self.apply_op(rhs);
+    }
+}
+
+impl<A: Ord> BitOrAssign<Dot<A>> for VClock<A> {
+    fn bitor_assign(&mut self, rhs: Dot<A>) {
+        self.apply_op(rhs);
+    }
+}
+
+impl<A: Ord> BitOrAssign for VClock<A> {
+    fn bitor_assign(&mut self, rhs: Self) {
+        self.merge(rhs)
     }
 }
 
@@ -166,6 +183,27 @@ impl<A: Ord> FromIterator<A> for VClock<A> {
         }
     }
 }
+
+//
+// Formatting
+//
+
+impl<A: Ord + Debug> Debug for VClock<A> {
+    /// Formats the display string
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let xs = self
+            .dots
+            .iter()
+            .map(|(a, c)| format!("{:?}:{}", a, c))
+            .collect::<Vec<String>>()
+            .join(", ");
+        write!(f, "<{}>", xs)
+    }
+}
+
+//
+// Tests
+//
 
 #[cfg(test)]
 mod tests {
@@ -293,5 +331,45 @@ mod tests {
     fn test_iter() {
         let xs = VClock::<i32>::from_iter([1, 2, 3]);
         assert_eq!(3, xs.iter().count());
+    }
+
+    #[test]
+    fn test_add_assign() {
+        let mut v = VClock::<i32>::from_iter([1, 2, 3]);
+        v += (1, 10).into();
+
+        assert_eq!(10, v.counter(&1));
+        assert_eq!(0, v.counter(&2));
+        assert_eq!(0, v.counter(&3));
+    }
+
+    #[test]
+    fn test_bitor_assign() {
+        let mut v1 = VClock::<i32>::from_iter([1, 2, 3]);
+        v1.apply_op((1, 10).into());
+        v1.apply_op((3, 30).into());
+
+        let mut v2 = VClock::<i32>::from_iter([1, 2, 3, 4]);
+        v2.apply_op((1, 15).into());
+        v2.apply_op((2, 20).into());
+        v2.apply_op((3, 28).into());
+
+        v1 |= v2;
+
+        assert_eq!(15, v1.counter(&1));
+        assert_eq!(20, v1.counter(&2));
+        assert_eq!(30, v1.counter(&3));
+        assert_eq!(0, v1.counter(&4));
+    }
+
+    #[test]
+    fn test_bitor_assign_dot() {
+        let mut v = VClock::<i32>::from_iter([1, 2, 3]);
+        let a: Dot<i32> = (1, 10).into();
+        v |= a;
+
+        assert_eq!(10, v.counter(&1));
+        assert_eq!(0, v.counter(&2));
+        assert_eq!(0, v.counter(&3));
     }
 }
