@@ -2,6 +2,7 @@ use super::CausalOrd;
 
 use std::cmp::Ordering;
 use std::fmt::Debug;
+use std::ops::{Add, AddAssign};
 
 /// The dot structure pairs an actor with a counter. It can be
 /// used to implement vector clocks, dotted vector clocks, and
@@ -29,6 +30,10 @@ pub struct Dot<A> {
     pub(crate) counter: u64,
 }
 
+//
+// Public functions
+//
+
 impl<A> Dot<A> {
     /// Creates a new instance of the dot
     pub fn new(actor: A, counter: u64) -> Self {
@@ -37,23 +42,45 @@ impl<A> Dot<A> {
 
     /// Applies to the current dot an increment operation.
     pub fn apply_inc_op(&mut self) {
-        self.counter += 1;
+        self.apply_step_op(1);
     }
-}
 
-impl<A: Debug> Debug for Dot<A> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{:?}:{}", self.actor, self.counter)
+    /// Applies to the current dot an increment with a given step operation.
+    pub(crate) fn apply_step_op(&mut self, s: u64) {
+        self.counter += s;
     }
 }
 
 impl<A: Clone> Dot<A> {
     /// Returns a new Dot with incremented counter
     pub fn incr(&self) -> Self {
+        self.step(1)
+    }
+
+    /// Returns a new Dot with an incremented counter with a given step.
+    pub fn step(&self, s: u64) -> Self {
         Self {
             actor: self.actor.clone(),
-            counter: self.counter + 1,
+            counter: self.counter + s,
         }
+    }
+}
+
+//
+// Operations
+//
+
+impl<A: Clone> Add<u64> for Dot<A> {
+    type Output = Dot<A>;
+
+    fn add(self, rhs: u64) -> Self::Output {
+        self.step(rhs)
+    }
+}
+
+impl<A: Clone> AddAssign<u64> for Dot<A> {
+    fn add_assign(&mut self, rhs: u64) {
+        self.apply_step_op(rhs);
     }
 }
 
@@ -96,6 +123,20 @@ impl<A> From<A> for Dot<A> {
         Self { actor, counter: 0 }
     }
 }
+
+//
+// Formatting
+//
+
+impl<A: Debug> Debug for Dot<A> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{:?}:{}", self.actor, self.counter)
+    }
+}
+
+//
+// Tests
+//
 
 #[cfg(test)]
 mod tests {
@@ -246,9 +287,37 @@ mod tests {
     }
 
     #[quickcheck]
+    fn test_apply_step_op(actor: i32, counter: u32) -> bool {
+        let mut dot = Dot::new(actor, counter as u64);
+        dot.apply_step_op(20);
+        dot.actor == actor && dot.counter == (counter as u64) + 20
+    }
+
+    #[quickcheck]
     fn test_incr(actor: i32, counter: u32) -> bool {
         let dot = Dot::new(actor, counter as u64);
         let dot1 = dot.incr();
         dot1.actor == actor && dot1.counter == (counter as u64) + 1
+    }
+
+    #[quickcheck]
+    fn test_step(actor: i32, counter: u32) -> bool {
+        let dot = Dot::new(actor, counter as u64);
+        let dot1 = dot.step(10);
+        dot1.actor == actor && dot1.counter == (counter as u64) + 10
+    }
+
+    #[quickcheck]
+    fn test_add(actor: i32, counter: u32) -> bool {
+        let dot = Dot::new(actor, counter as u64);
+        let dot1 = dot + 1;
+        dot1.actor == actor && dot1.counter == (counter as u64) + 1
+    }
+
+    #[quickcheck]
+    fn test_add_assign(actor: i32, counter: u32) -> bool {
+        let mut dot = Dot::new(actor, counter as u64);
+        dot += 1;
+        dot.counter == (counter as u64) + 1
     }
 }
