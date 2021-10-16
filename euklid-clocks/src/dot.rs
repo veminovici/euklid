@@ -9,7 +9,7 @@ pub struct Dot<A> {
     /// The actor identifier
     pub actor: A,
     /// The current counter value
-    pub counter: u64,
+    pub(crate) counter: u64,
 }
 
 impl<A> Dot<A> {
