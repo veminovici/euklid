@@ -206,10 +206,60 @@ mod tests {
     }
 
     #[test]
+    fn test_crdt_apply_dot() {
+        let mut v = VClock::<i32>::from_iter([1, 2, 3]);
+        let a = (1, 10).into();
+        v.apply_op(a);
+
+        assert_eq!(10, v.counter(&1));
+        assert_eq!(0, v.counter(&2));
+        assert_eq!(0, v.counter(&3));
+    }
+
+    #[test]
+    fn test_crdt_merge() {
+        let mut v1 = VClock::<i32>::from_iter([1, 2, 3]);
+        v1.apply_op((1, 10).into());
+        v1.apply_op((3, 30).into());
+
+        let mut v2 = VClock::<i32>::from_iter([1, 2, 3, 4]);
+        v2.apply_op((1, 15).into());
+        v2.apply_op((2, 20).into());
+        v2.apply_op((3, 28).into());
+
+        v1.merge(v2);
+
+        assert_eq!(15, v1.counter(&1));
+        assert_eq!(20, v1.counter(&2));
+        assert_eq!(30, v1.counter(&3));
+        assert_eq!(0, v1.counter(&4));
+    }
+
+    #[test]
     fn test_pord_eq() {
         let xs = VClock::<i32>::from_iter([1, 2, 3]);
         let ys = VClock::<i32>::from_iter([1, 2, 3]);
         assert_eq!(Some(Ordering::Equal), xs.partial_cmp(&ys));
+    }
+
+    #[test]
+    fn test_pord_gr() {
+        let mut v1 = VClock::<i32>::from_iter([1, 2, 3]);
+        v1.apply_op((1, 10).into());
+
+        let v2 = VClock::<i32>::from_iter([1, 2, 3]);
+
+        assert!(matches!(v1.partial_cmp(&v2), Some(Ordering::Greater)));
+    }
+
+    #[test]
+    fn test_pord_ls() {
+        let mut v1 = VClock::<i32>::from_iter([1, 2, 3]);
+        v1.apply_op((1, 10).into());
+
+        let v2 = VClock::<i32>::from_iter([1, 2, 3]);
+
+        assert!(matches!(v2.partial_cmp(&v1), Some(Ordering::Less)));
     }
 
     #[test]
