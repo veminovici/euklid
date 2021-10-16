@@ -263,6 +263,18 @@ mod tests {
     }
 
     #[test]
+    fn test_pord_none() {
+        let mut v1 = VClock::<i32>::from_iter([1, 2, 3]);
+        v1.apply_op((1, 10).into());
+        v1.apply_op((3, 30).into());
+
+        let mut v2 = VClock::<i32>::from_iter([1, 2, 3]);
+        v2.apply_op((2, 20).into());
+
+        assert!(matches!(v1.partial_cmp(&v2), None));
+    }
+
+    #[test]
     fn test_default() {
         let v = VClock::<i32>::default();
         assert!(v.is_empty());
