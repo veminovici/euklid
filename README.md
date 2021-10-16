@@ -89,18 +89,16 @@ use std::iter::FromIterator;
 // Create a vclock from a vector of actors.
 let mut v1 = VClock::<i32>::from_iter([1, 2, 3]);
 
-// Update the value of the '1' dot.
-let a: Dot<i32> = (1, 10).into();
-v1 |= a;
+// Update the value of for '1' and '3' actors.
+v1 |= Dot::new(1, 10);
+v1 |= Dot::new(3, 30);
 
-// Update the value f the '3' dot.
-v1.apply_op((3, 30).into());
-
+// Test the counter values for the 3 actors.
 assert_eq!(10, v1.counter(&1));
 assert_eq!(0, v1.counter(&2));
 assert_eq!(30, v1.counter(&3));
 
-// Create a second vector clock
+// Create a second vector clock (note that this vector has 4 actors)
 let mut v2 = VClock::<i32>::from_iter([1, 2, 3, 4]);
 v2 |= Dot::new(1, 15);
 v2 |= Dot::new(2, 20);
@@ -109,6 +107,8 @@ v2 |= Dot::new(3, 28);
 // Merge the two vvector clocks
 v1 |= v2;
 
+// Tests that the max values are in place
+// Also, the vector clock has values for 4 actors
 assert_eq!(15, v1.counter(&1));
 assert_eq!(20, v1.counter(&2));
 assert_eq!(30, v1.counter(&3));

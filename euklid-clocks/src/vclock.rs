@@ -20,12 +20,9 @@ use std::{
 /// // Create a vclock from a vector of actors.
 /// let mut v1 = VClock::<i32>::from_iter([1, 2, 3]);
 ///
-/// // Update the value of the '1' dot.
-/// let a: Dot<i32> = (1, 10).into();
-/// v1 |= a;
-///
-/// // Update the value f the '3' dot.
-/// v1.apply_op((3, 30).into());
+/// // Update the value of the '1' and '3' dots
+/// v1 |= Dot::new(1, 10);
+/// v1 |= Dot::new(3, 30);
 ///
 /// assert_eq!(10, v1.counter(&1));
 /// assert_eq!(0, v1.counter(&2));
