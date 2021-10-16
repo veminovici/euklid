@@ -21,6 +21,10 @@ use std::ops::{Add, AddAssign};
 /// assert!(dot1.descends(&dot1));
 /// assert!(dot2.descends(&dot1));
 /// assert!(dot2.dominates(&dot1));
+///
+/// let mut dot3 = dot2 + 1;
+/// dot3 += 10;
+/// println!("dot3={:?}", dot3);
 /// ```
 #[derive(Clone, Copy)]
 pub struct Dot<A> {

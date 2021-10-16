@@ -56,15 +56,23 @@ The [Dot](https://github.com/veminovici/euklid/blob/main/euklid-clocks/src/dot.r
 ```rust
 use euklid_clocks::*;
 
+// Create a dot from a pair
 let dot1: Dot<String> = ("A".to_string(), 1).into();
 println!("dot1={:?}", dot1);
 
+// Increment the dot
 let dot2 = dot1.incr();
 println!("dot2={:?}", dot2);
 
+// Assert against causal properties
 assert!(dot1.descends(&dot1));
 assert!(dot2.descends(&dot1));
 assert!(dot2.dominates(&dot1));
+
+// Use some operators (Add and AddAssign) for dots.
+let mut dot3 = dot2 + 1;
+dot3 += 10;
+println!("dot3={:?}", dot3);
 ```
 More examples can be found in the [example](https://github.com/veminovici/euklid/blob/main/examples/dot.rs) file.
 
@@ -72,18 +80,39 @@ More examples can be found in the [example](https://github.com/veminovici/euklid
 
 ### Vector Clock
 The [VClock](https://github.com/veminovici/euklid/blob/main/src/vclock.rs) is implementing a vector clock.
+
+
 ```rust
-extern crate euklid;
-use euklid::{Dot, VClock};
+use euklid_clocks::*;
+use std::iter::FromIterator;
 
-// Create a vclock and increment the counter for user A.
-let mut a = VClock::new();
+// Create a vclock from a vector of actors.
+let mut v1 = VClock::<i32>::from_iter([1, 2, 3]);
 
-// Increment the counter for actor A
-a.apply(a.inc_op("A"));
+// Update the value of the '1' dot.
+let a: Dot<i32> = (1, 10).into();
+v1 |= a;
 
-// Increment the counter for actor B
-a.apply(a.inc_op("B"));
+// Update the value f the '3' dot.
+v1.apply_op((3, 30).into());
+
+assert_eq!(10, v1.counter(&1));
+assert_eq!(0, v1.counter(&2));
+assert_eq!(30, v1.counter(&3));
+
+// Create a second vector clock
+let mut v2 = VClock::<i32>::from_iter([1, 2, 3, 4]);
+v2 |= Dot::new(1, 15);
+v2 |= Dot::new(2, 20);
+v2 |= Dot::new(3, 28);
+
+// Merge the two vvector clocks
+v1 |= v2;
+
+assert_eq!(15, v1.counter(&1));
+assert_eq!(20, v1.counter(&2));
+assert_eq!(30, v1.counter(&3));
+assert_eq!(0, v1.counter(&4));
 ```
 
 More examples can be found in the [example](https://github.com/veminovici/euklid/blob/main/examples/vclock.rs) file.

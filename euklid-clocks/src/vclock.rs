@@ -6,10 +6,45 @@ use std::{
     collections::{btree_map, BTreeMap},
     fmt::Debug,
     iter::FromIterator,
-    ops::{AddAssign, BitOrAssign},
+    ops::BitOrAssign,
 };
 
 /// A vector clock.
+///
+/// # Example
+///
+/// ```rust
+/// use euklid_clocks::*;
+/// use std::iter::FromIterator;
+///
+/// // Create a vclock from a vector of actors.
+/// let mut v1 = VClock::<i32>::from_iter([1, 2, 3]);
+///
+/// // Update the value of the '1' dot.
+/// let a: Dot<i32> = (1, 10).into();
+/// v1 |= a;
+///
+/// // Update the value f the '3' dot.
+/// v1.apply_op((3, 30).into());
+///
+/// assert_eq!(10, v1.counter(&1));
+/// assert_eq!(0, v1.counter(&2));
+/// assert_eq!(30, v1.counter(&3));
+///
+/// // Create a second vector clock
+/// let mut v2 = VClock::<i32>::from_iter([1, 2, 3, 4]);
+/// v2 |= Dot::new(1, 15);
+/// v2 |= Dot::new(2, 20);
+/// v2 |= Dot::new(3, 28);
+///
+/// // Merge the two vvector clocks
+/// v1 |= v2;
+///
+/// assert_eq!(15, v1.counter(&1));
+/// assert_eq!(20, v1.counter(&2));
+/// assert_eq!(30, v1.counter(&3));
+/// assert_eq!(0, v1.counter(&4));
+/// ```
 pub struct VClock<A: Ord> {
     /// dots store the map between actors and their associated counters
     dots: BTreeMap<A, u64>,
@@ -45,7 +80,7 @@ impl<A: Ord> VClock<A> {
 
     /// Returns the counter for a given actor. If the actor
     /// is not stored in the vector, it returns 0.
-    pub(crate) fn counter(&self, actor: &A) -> u64 {
+    pub fn counter(&self, actor: &A) -> u64 {
         self.dots.get(actor).cloned().unwrap_or(0)
     }
 }
@@ -122,12 +157,6 @@ impl<A: Ord> CmRDT for VClock<A> {
 //
 // Operations
 //
-
-impl<A: Ord> AddAssign<Dot<A>> for VClock<A> {
-    fn add_assign(&mut self, rhs: Dot<A>) {
-        self.apply_op(rhs);
-    }
-}
 
 impl<A: Ord> BitOrAssign<Dot<A>> for VClock<A> {
     fn bitor_assign(&mut self, rhs: Dot<A>) {
@@ -331,16 +360,6 @@ mod tests {
     fn test_iter() {
         let xs = VClock::<i32>::from_iter([1, 2, 3]);
         assert_eq!(3, xs.iter().count());
-    }
-
-    #[test]
-    fn test_add_assign() {
-        let mut v = VClock::<i32>::from_iter([1, 2, 3]);
-        v += (1, 10).into();
-
-        assert_eq!(10, v.counter(&1));
-        assert_eq!(0, v.counter(&2));
-        assert_eq!(0, v.counter(&3));
     }
 
     #[test]
