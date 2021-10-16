@@ -3,7 +3,24 @@ use super::CausalOrd;
 use std::cmp::Ordering;
 use std::fmt::Debug;
 
-/// The dot structure pairs an actor with a counter.
+/// The dot structure pairs an actor with a counter. It can be
+/// used to implement vector clocks, dotted vector clocks, and
+/// other CRDTs structures.
+///
+/// # Example
+///
+/// ```rust
+/// use euklid_clocks::*;
+///
+/// let dot1: Dot<String> = ("A".to_string(), 1).into();
+/// println!("dot1={:?}", dot1);
+/// let dot2 = dot1.incr();
+/// println!("dot2={:?}", dot2);
+///
+/// assert!(dot1.descends(&dot1));
+/// assert!(dot2.descends(&dot1));
+/// assert!(dot2.dominates(&dot1));
+/// ```
 #[derive(Clone, Copy)]
 pub struct Dot<A> {
     /// The actor identifier
@@ -32,7 +49,7 @@ impl<A: Debug> Debug for Dot<A> {
 
 impl<A: Clone> Dot<A> {
     /// Returns a new Dot with incremented counter
-    pub fn inc(&self) -> Self {
+    pub fn incr(&self) -> Self {
         Self {
             actor: self.actor.clone(),
             counter: self.counter + 1,
@@ -229,9 +246,9 @@ mod tests {
     }
 
     #[quickcheck]
-    fn test_inc(actor: i32, counter: u32) -> bool {
+    fn test_incr(actor: i32, counter: u32) -> bool {
         let dot = Dot::new(actor, counter as u64);
-        let dot1 = dot.inc();
+        let dot1 = dot.incr();
         dot1.actor == actor && dot1.counter == (counter as u64) + 1
     }
 }

@@ -14,15 +14,19 @@ Just another rust crate, this one implements CRDTs things.
 <br/>
 
 ### Dot
-The [Dot](https://github.com/veminovici/euklid/blob/main/src/dot.rs) is implementing a marked version.
+The [Dot](https://github.com/veminovici/euklid/blob/main/euklid-clocks/src/dot.rs) is implementing a dot for clocks.
 ```rust
-extern crate euklid;
-use euklid::Dot;
+use euklid_clocks::*;
 
-// Create a dot for actor Alice.
-let mut dot = Dot::new("Alice".to_string(), 0);
-// Increment the dot.
-dot.apply_inc();
+let dot1: Dot<String> = ("A".to_string(), 1).into();
+println!("dot1={:?}", dot1);
+
+let dot2 = dot1.incr();
+println!("dot2={:?}", dot2);
+
+assert!(dot1.descends(&dot1));
+assert!(dot2.descends(&dot1));
+assert!(dot2.dominates(&dot1));
 ```
 More examples can be found in the [example](https://github.com/veminovici/euklid/blob/main/examples/dot.rs) file.
 
