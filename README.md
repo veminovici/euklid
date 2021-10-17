@@ -38,13 +38,16 @@ pub trait CausalOrd: PartialOrd<Self> {
     fn causal_cmp(&self, other: &Self) -> CausalOrdering;
 
     /// This method tests succeed (for `self` and `other`)
-    fn dominates(&self, other: &Self) -> bool;
+    fn is_dominating(&self, other: &Self) -> bool;
 
     /// This method tests succeed and identical (for `self` and `other`)
-    fn descends(&self, other: &Self) -> bool ;
+    fn is_descendant(&self, other: &Self) -> bool;
+
+    /// This method tests preceds (for `self` and `other`)
+    fn is_ancestor(&self, other: &Self) -> bool;
 
     /// This method tests concurrent (for `self` and `other`)
-    fn concurrent(&self, other: &Self) -> bool;
+    fn is_concurrent(&self, other: &Self) -> bool;
 }
 ```
 
@@ -65,9 +68,9 @@ let dot2 = dot1.incr();
 println!("dot2={:?}", dot2);
 
 // Assert against causal properties
-assert!(dot1.descends(&dot1));
-assert!(dot2.descends(&dot1));
-assert!(dot2.dominates(&dot1));
+assert!(dot1.is_descendant(&dot1));
+assert!(dot2.is_descendant(&dot1));
+assert!(dot2.is_dominating(&dot1));
 
 // Use some operators (Add and AddAssign) for dots.
 let mut dot3 = dot2 + 1;

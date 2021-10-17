@@ -18,9 +18,9 @@ use std::ops::{Add, AddAssign};
 /// let dot2 = dot1.incr();
 /// println!("dot2={:?}", dot2);
 ///
-/// assert!(dot1.descends(&dot1));
-/// assert!(dot2.descends(&dot1));
-/// assert!(dot2.dominates(&dot1));
+/// assert!(dot1.is_descendant(&dot1));
+/// assert!(dot2.is_descendant(&dot1));
+/// assert!(dot2.is_dominating(&dot1));
 ///
 /// let mut dot3 = dot2 + 1;
 /// dot3 += 10;
@@ -247,28 +247,28 @@ mod tests {
     #[quickcheck]
     fn test_descents_eq(actor: i32, counter: u32) -> bool {
         let dot = Dot::new(actor, counter as u64);
-        dot.descends(&dot)
+        dot.is_descendant(&dot)
     }
 
     #[quickcheck]
     fn test_descents_succ(actor: i32, counter: u32) -> bool {
         let dot = Dot::new(actor, counter as u64);
         let dot1 = Dot::new(actor, (counter as u64) + 1);
-        dot1.descends(&dot)
+        dot1.is_descendant(&dot)
     }
 
     #[quickcheck]
     fn test_dominates(actor: i32, counter: u32) -> bool {
         let dot = Dot::new(actor, counter as u64);
         let dot1 = Dot::new(actor, (counter as u64) + 1);
-        dot1.dominates(&dot)
+        dot1.is_dominating(&dot)
     }
 
     #[quickcheck]
     fn test_concurrent(actor: i16, counter: u64) -> bool {
         let a = Dot::new(actor as i32, counter);
         let b = Dot::new((actor as i32) + 1, counter);
-        b.concurrent(&a)
+        b.is_concurrent(&a)
     }
 
     #[quickcheck]

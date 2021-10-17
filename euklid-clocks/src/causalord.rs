@@ -30,20 +30,25 @@ pub trait CausalOrd: PartialOrd<Self> {
     }
 
     /// This method tests succeed (for `self` and `other`)
-    fn dominates(&self, other: &Self) -> bool {
+    fn is_dominating(&self, other: &Self) -> bool {
         matches!(self.causal_cmp(other), CausalOrdering::Succeed)
     }
 
     /// This method tests succeed and identical (for `self` and `other`)
-    fn descends(&self, other: &Self) -> bool {
+    fn is_descendant(&self, other: &Self) -> bool {
         matches!(
             self.causal_cmp(other),
             CausalOrdering::Succeed | CausalOrdering::Equal
         )
     }
 
+    /// This method tests preceds (for `self` and `other`)
+    fn is_ancestor(&self, other: &Self) -> bool {
+        matches!(self.causal_cmp(other), CausalOrdering::Precede)
+    }
+
     /// This method tests concurrent (for `self` and `other`)
-    fn concurrent(&self, other: &Self) -> bool {
+    fn is_concurrent(&self, other: &Self) -> bool {
         matches!(self.causal_cmp(other), CausalOrdering::Concurrent)
     }
 }
