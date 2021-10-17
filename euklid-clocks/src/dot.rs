@@ -2,7 +2,7 @@ use super::CausalOrd;
 
 use std::cmp::Ordering;
 use std::fmt::Debug;
-use std::ops::{Add, AddAssign};
+use std::ops::{Add, AddAssign, BitOrAssign};
 
 /// The dot structure pairs an actor with a counter. It can be
 /// used to implement vector clocks, dotted vector clocks, and
@@ -25,13 +25,16 @@ use std::ops::{Add, AddAssign};
 /// let mut dot3 = dot2 + 1;
 /// dot3 += 10;
 /// println!("dot3={:?}", dot3);
+///
+/// dot3 |= 30;
+/// assert_eq!(30, dot3.counter);
 /// ```
 #[derive(Clone, Copy)]
 pub struct Dot<A> {
     /// The actor identifier
     pub actor: A,
     /// The current counter value
-    pub(crate) counter: u64,
+    pub counter: u64,
 }
 
 //
@@ -82,9 +85,25 @@ impl<A: Clone> Add<u64> for Dot<A> {
     }
 }
 
-impl<A: Clone> AddAssign<u64> for Dot<A> {
+impl<A> AddAssign<u64> for Dot<A> {
     fn add_assign(&mut self, rhs: u64) {
         self.apply_step_op(rhs);
+    }
+}
+
+impl<A> BitOrAssign<u64> for Dot<A> {
+    fn bitor_assign(&mut self, rhs: u64) {
+        if self.counter < rhs {
+            self.counter = rhs;
+        }
+    }
+}
+
+impl<A: PartialEq> BitOrAssign for Dot<A> {
+    fn bitor_assign(&mut self, rhs: Self) {
+        if self.actor == rhs.actor && self.counter < rhs.counter {
+            self.counter = rhs.counter;
+        }
     }
 }
 
@@ -330,5 +349,43 @@ mod tests {
         let mut dot = Dot::new(actor, counter as u64);
         dot += 1;
         dot.counter == (counter as u64) + 1
+    }
+
+    #[quickcheck]
+    fn test_bitor_assign_ok(actor: i32, counter: u32) -> bool {
+        let mut dot = Dot::new(actor, counter as u64);
+        dot |= (counter as u64) + 10;
+        dot.counter == (counter as u64) + 10
+    }
+
+    #[quickcheck]
+    fn test_bitor_assign_no(actor: i32, counter: u32) -> bool {
+        let mut dot = Dot::new(actor, (counter as u64) + 10);
+        dot |= counter as u64;
+        dot.counter == (counter as u64) + 10
+    }
+
+    #[quickcheck]
+    fn test_dot_bitorassign_ok(actor: i32, counter: u32) -> bool {
+        let mut dot = Dot::new(actor, counter as u64);
+        let dot1 = Dot::new(actor, counter as u64 + 10);
+        dot |= dot1;
+        dot.counter == (counter as u64) + 10
+    }
+
+    #[quickcheck]
+    fn test_dot_bitorassign_no_actor(actor: i16, counter: u32) -> bool {
+        let mut dot = Dot::new(actor as i32, counter as u64);
+        let dot1 = Dot::new(actor as i32 + 1, counter as u64 + 10);
+        dot |= dot1;
+        dot.counter == counter as u64
+    }
+
+    #[quickcheck]
+    fn test_dot_bitorassign_no_counter(actor: i32, counter: u32) -> bool {
+        let mut dot = Dot::new(actor, counter as u64 + 10);
+        let dot1 = Dot::new(actor, counter as u64);
+        dot |= dot1;
+        dot.counter == (counter as u64) + 10
     }
 }

@@ -72,10 +72,15 @@ assert!(dot1.is_descendant(&dot1));
 assert!(dot2.is_descendant(&dot1));
 assert!(dot2.is_dominating(&dot1));
 
-// YOu can use the Add and addAssign operators for dots.
+// You can use the Add and addAssign operators for dots.
 let mut dot3 = dot2 + 1;
 dot3 += 10;
 println!("dot3={:?}", dot3);
+
+// Also you can merge the dot with a new value (assign it only when the value increases)
+// using the bitor assign operator
+dot3 |= 30;
+assert_eq!(30, dot3.counter);
 ```
 
 For a full example go to the [clock_dot.rs](https://github.com/veminovici/euklid/blob/main/euklid-clocks/examples/clock_dot.rs) file.
