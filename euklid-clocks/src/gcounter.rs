@@ -55,6 +55,14 @@ impl<A: Clone + Ord> GCounter<A> {
     }
 }
 
+impl<A: Copy + Ord> GCounter<A> {
+    /// Increments the value for a given actor.
+    pub fn incr(&mut self, actor: &A) {
+        let dot = self.counters.dot(actor).incr();
+        self.merge_dot(dot);
+    }
+}
+
 //
 // CRDT
 //
@@ -234,5 +242,12 @@ mod tests {
         gc.merge_dot(Dot::new(2, 20));
         assert_eq!(gc.counters.len(), 2);
         assert_eq!(gc.value(), 30);
+    }
+
+    #[test]
+    fn test_incr() {
+        let mut a = GCounter::<i32>::from_iter([(1, 10), (2, 0), (3, 20)]);
+        a.incr(&1);
+        assert_eq!(11 + 20, a.value());
     }
 }
