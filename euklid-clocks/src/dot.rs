@@ -245,30 +245,37 @@ mod tests {
     }
 
     #[quickcheck]
-    fn test_descents_eq(actor: i32, counter: u32) -> bool {
+    fn test_is_descendant_eq(actor: i32, counter: u32) -> bool {
         let dot = Dot::new(actor, counter as u64);
         dot.is_descendant(&dot)
     }
 
     #[quickcheck]
-    fn test_descents_succ(actor: i32, counter: u32) -> bool {
+    fn test_is_descendant_succ(actor: i32, counter: u32) -> bool {
         let dot = Dot::new(actor, counter as u64);
         let dot1 = Dot::new(actor, (counter as u64) + 1);
         dot1.is_descendant(&dot)
     }
 
     #[quickcheck]
-    fn test_dominates(actor: i32, counter: u32) -> bool {
+    fn test_is_dominating(actor: i32, counter: u32) -> bool {
         let dot = Dot::new(actor, counter as u64);
         let dot1 = Dot::new(actor, (counter as u64) + 1);
         dot1.is_dominating(&dot)
     }
 
     #[quickcheck]
-    fn test_concurrent(actor: i16, counter: u64) -> bool {
+    fn test_is_concurrent(actor: i16, counter: u64) -> bool {
         let a = Dot::new(actor as i32, counter);
         let b = Dot::new((actor as i32) + 1, counter);
         b.is_concurrent(&a)
+    }
+
+    #[quickcheck]
+    fn test_is_ancestor(actor: i32, counter: u32) -> bool {
+        let dot = Dot::new(actor, counter as u64);
+        let dot1 = Dot::new(actor, (counter as u64) + 1);
+        dot.is_ancestor(&dot1)
     }
 
     #[quickcheck]
