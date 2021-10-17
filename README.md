@@ -72,7 +72,7 @@ assert!(dot1.is_descendant(&dot1));
 assert!(dot2.is_descendant(&dot1));
 assert!(dot2.is_dominating(&dot1));
 
-// Use some operators (Add and AddAssign) for dots.
+// YOu can use the Add and addAssign operators for dots.
 let mut dot3 = dot2 + 1;
 dot3 += 10;
 println!("dot3={:?}", dot3);
@@ -97,11 +97,6 @@ let mut v1 = VClock::<i32>::from_iter([1, 2, 3]);
 v1 |= Dot::new(1, 10);
 v1 |= Dot::new(3, 30);
 
-// Test the counter values for the 3 actors.
-assert_eq!(10, v1.counter(&1));
-assert_eq!(0, v1.counter(&2));
-assert_eq!(30, v1.counter(&3));
-
 // Create a second vector clock (note that this vector has 4 actors)
 let mut v2 = VClock::<i32>::from_iter([1, 2, 3, 4]);
 v2 |= Dot::new(1, 15);
@@ -123,18 +118,26 @@ For a full example go to the [clock_vec.rs](https://github.com/veminovici/euklid
 
 <br/>
 
-### Dottet-Vector-Value
-The crate exposes **Dvv** structure which is an implementation of a dotted-vector-value.
+### Dotted-Vector-Value
+The crate exposes **Dvv** structure which is an implementation of a dotted-vector-value. For more resources, please check out the resources section.
+I found very useful the following two blog posts: [Vector Clocks Revisited](https://riak.com/posts/technical/vector-clocks-revisited/index.html?p=9545.html) and [Vector Clocks Revisited Part2: Dotted Version Vectors](https://riak.com/posts/technical/vector-clocks-revisited-part-2-dotted-version-vectors/index.html).
 
 ```rust
 use euklid_clocks::*;
 
-let mut srv_dvv: Dvv<i32, String> = Dvv::new(1234); // Create a dvv on server '1234'
+// Create a dvv on server '1234'
+let mut srv_dvv: Dvv<i32, String> = Dvv::new(1234);
 
-let mut cy_dot = srv_dvv.dot; // the client gets the dot from the server
-let msg = (cy_dot, "Bob".to_string()); // server receives from a client the 'bob' value.
-srv_dvv.merge(&msg.0, &msg.1); // server merges the received value.
+// the client gets the dot from the server
+let mut cy_dot = srv_dvv.dot;
 
+// server receives from a client the 'bob' value.
+let msg = (cy_dot, "Bob".to_string());
+
+// server merges the received value.
+srv_dvv.merge(&msg.0, &msg.1);
+
+// print the ddv content
 println!("srv_ddv {:?}", srv_dvv);
 ```
 
