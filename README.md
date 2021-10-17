@@ -153,6 +153,24 @@ For a full example go to the [clock_dvv.rs](https://github.com/veminovici/euklid
 
 <br/>
 
+### GCounter
+The crate **GCounter** structure is an implementation of the **g-counter** CRDT.
+
+```rust
+use euklid_clocks::*;
+use std::iter::FromIterator;
+
+let mut a = GCounter::<i32>::from_iter([(1, 10), (2, 0), (3, 20)]);
+let b = GCounter::<i32>::from_iter([(1, 5), (2, 5)]);
+
+// Merging the two counters.
+a |= b;
+
+assert_eq!(a.value(), 10 + 5 + 20);
+```
+
+<br/>
+
 ### Resources
 - [Vector Clocks Revisited](https://riak.com/posts/technical/vector-clocks-revisited/index.html?p=9545.html)
 - [Vector Clocks Revisited Part2: Dotted Version Vectors](https://riak.com/posts/technical/vector-clocks-revisited-part-2-dotted-version-vectors/index.html)

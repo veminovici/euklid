@@ -198,6 +198,10 @@ impl<A: Ord> std::iter::IntoIterator for VClock<A> {
     }
 }
 
+//
+// Froms
+//
+
 impl<A: Ord> FromIterator<A> for VClock<A> {
     fn from_iter<T: IntoIterator<Item = A>>(iter: T) -> Self {
         let xs = iter
