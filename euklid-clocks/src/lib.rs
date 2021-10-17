@@ -7,6 +7,7 @@ mod causalord;
 mod dot;
 mod dvv;
 mod gcounter;
+mod pncounter;
 mod vclock;
 
 /// An operation based CRDT.
@@ -30,4 +31,5 @@ pub use crate::causalord::*;
 pub use crate::dot::Dot;
 pub use crate::dvv::Dvv;
 pub use crate::gcounter::GCounter;
-pub use crate::vclock::*;
+pub use crate::pncounter::PnCounter;
+pub use crate::vclock::VClock;
