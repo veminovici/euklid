@@ -131,16 +131,19 @@ I found very useful the following two blog posts: [Vector Clocks Revisited](http
 use euklid_clocks::*;
 
 // Create a dvv on server '1234'
-let mut srv_dvv: Dvv<i32, String> = Dvv::new(1234);
+let mut dvv: Dvv<i32, String> = Dvv::new(1234);
 
 // the client gets the dot from the server
-let mut cy_dot = srv_dvv.dot;
+let mut cy_dot = dvv.dot;
 
 // server receives from a client the 'bob' value.
-let msg = (cy_dot, "Bob".to_string());
+let msg = (, "Bob".to_string());
 
 // server merges the received value.
-srv_dvv.merge(&msg.0, &msg.1);
+dvv.merge(&msg.0, &msg.1);
+
+// or you can merge using bitor_assign operator
+dvv |= msg;
 
 // print the ddv content
 println!("srv_ddv {:?}", srv_dvv);
