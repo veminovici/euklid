@@ -82,6 +82,10 @@ impl<A: Debug, T: Debug> std::fmt::Debug for Dvv<A, T> {
     }
 }
 
+//
+// Tests
+//
+
 #[cfg(test)]
 mod tests {
     use super::*;
