@@ -9,11 +9,9 @@ Just another rust crate, this one implements CRDTs things.
 [![Last commit](https://img.shields.io/github/last-commit/veminovici/euklid)](https://github.com/veminovici/euklid)
 [![Repo size](https://img.shields.io/github/repo-size/veminovici/euklid)](https://github.com/veminovici/euklid)
 
-[![Github Actions](https://buildstats.info/github/chart/veminovici/euklid)](https://github.com/veminovici/euklid)
+## 1. Causality
 
-<br/>
-
-### Causality
+### 1.1. CausalOrdering Enumeration
 The crate defines the **CausalOrdering** enumeration which has 4 values:
 
 ```rust
@@ -29,6 +27,7 @@ pub enum CausalOrdering {
 }
 ```
 
+### 1.2. CausalOrd Trait
 The crate also defines **CausalOrd** trait which along with the **CasualOrdering** allows the caller
 to determine if there is any causality between two different instances of the **CausalOrd**. The trait defines
 
@@ -51,10 +50,12 @@ pub trait CausalOrd: PartialOrd<Self> {
 }
 ```
 
-If a structure implements the **std::cmn::PartialOrd**, you can implement the **CausalOrd**. You dont have to impement any of its
+If a structure implements the **std::cmp::PartialOrd**, you can implement the **CausalOrd**. You dont have to impement any of its
 functions, since all of them have default implementations.
 
-### Dot
+## 2. CRDTs
+
+### 2.1. Dot
 The [Dot](https://github.com/veminovici/euklid/blob/main/euklid-clocks/src/dot.rs) is implementing a dot for clocks.
 ```rust
 use euklid_clocks::*;
@@ -85,11 +86,8 @@ assert_eq!(30, dot3.counter);
 
 For a full example go to the [clock_dot.rs](https://github.com/veminovici/euklid/blob/main/euklid-clocks/examples/clock_dot.rs) file.
 
-<br/>
-
-### Vector Clock
+### 2.2. Vector Clock
 The [VClock](https://github.com/veminovici/euklid/blob/main/src/vclock.rs) is implementing a vector clock.
-
 
 ```rust
 use euklid_clocks::*;
@@ -121,9 +119,7 @@ assert_eq!(0, v1.counter(&4));
 
 For a full example go to the [clock_vec.rs](https://github.com/veminovici/euklid/blob/main/euklid-clocks/examples/clock_vec.rs) file.
 
-<br/>
-
-### Dotted-Vector-Value
+### 2.3. Dotted-Vector-Value
 The crate exposes **Dvv** structure which is an implementation of a dotted-vector-value. For more resources, please check out the resources section.
 I found very useful the following two blog posts: [Vector Clocks Revisited](https://riak.com/posts/technical/vector-clocks-revisited/index.html?p=9545.html) and [Vector Clocks Revisited Part2: Dotted Version Vectors](https://riak.com/posts/technical/vector-clocks-revisited-part-2-dotted-version-vectors/index.html).
 
@@ -151,9 +147,7 @@ println!("srv_ddv {:?}", srv_dvv);
 
 For a full example go to the [clock_dvv.rs](https://github.com/veminovici/euklid/blob/main/euklid-clocks/examples/clock_dvv.rs) file.
 
-<br/>
-
-### GCounter
+### 2.4. GCounter
 The crate **GCounter** structure is an implementation of the **g-counter** CRDT.
 
 ```rust
@@ -169,9 +163,7 @@ a |= b;
 assert_eq!(a.value(), 10 + 5 + 20);
 ```
 
-<br/>
-
-### Resources
+## 3. Resources
 - [Vector Clocks Revisited](https://riak.com/posts/technical/vector-clocks-revisited/index.html?p=9545.html)
 - [Vector Clocks Revisited Part2: Dotted Version Vectors](https://riak.com/posts/technical/vector-clocks-revisited-part-2-dotted-version-vectors/index.html)
 - [Version Vector](https://martinfowler.com/articles/patterns-of-distributed-systems/version-vector.html#:~:text=Dotted%20version%20vectors%20One%20of%20the%20major%20problems,time.%20The%20problem%20is%20called%20as%20sibling%20explosion.)
@@ -184,7 +176,9 @@ assert_eq!(a.value(), 10 + 5 + 20);
 - [Rust code coverage](https://eipi.xyz/blog/rust-code-coverage-with-github-workflows/)
 - [Github workflows for Rust](https://eipi.xyz/blog/github-workflows-to-do-useful-things-with-rust/)
 
-<br/>
+## 4. Builds
+
+[![Github Actions](https://buildstats.info/github/chart/veminovici/euklid)](https://github.com/veminovici/euklid)
 
 ### Thank you!!!
 
