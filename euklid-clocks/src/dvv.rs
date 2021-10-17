@@ -11,16 +11,16 @@ use std::ops::BitOrAssign;
 ///
 /// let mut dvv: Dvv<i32, String> = Dvv::new(1234);
 ///
-/// dvv |= (Dot::new(1234, 0), "Bob".to_string());
+/// dvv |= (0, "Bob".to_string());
 /// assert_eq!(1, dvv.dot.counter);
 ///
-/// dvv |= (Dot::new(1234, 0), "Sue".to_string());
+/// dvv |= (0, "Sue".to_string());
 /// assert_eq!(2, dvv.dot.counter);
 ///
-/// dvv |= (Dot::new(1234, 1), "Rita".to_string());
+/// dvv |= (1, "Rita".to_string());
 /// assert_eq!(3, dvv.dot.counter);
 ///
-/// dvv |= (Dot::new(1234, 2), "Michelle".to_string());
+/// dvv |= (2, "Michelle".to_string());
 /// assert_eq!(4, dvv.dot.counter);
 /// ```
 pub struct Dvv<A, T> {
@@ -61,7 +61,14 @@ impl<A: Copy + PartialOrd, T: Clone> Dvv<A, T> {
 
 impl<A: Copy + PartialOrd, T: Clone> BitOrAssign<(Dot<A>, T)> for Dvv<A, T> {
     fn bitor_assign(&mut self, rhs: (Dot<A>, T)) {
-        self.merge(&rhs.0, &rhs.1)
+        self.merge(&rhs.0, &rhs.1);
+    }
+}
+
+impl<A: Copy + PartialOrd, T: Clone> BitOrAssign<(u64, T)> for Dvv<A, T> {
+    fn bitor_assign(&mut self, rhs: (u64, T)) {
+        let dot = Dot::new(self.dot.actor, rhs.0);
+        self.merge(&dot, &rhs.1);
     }
 }
 
@@ -130,7 +137,7 @@ mod tests {
     }
 
     #[test]
-    fn test_bitor() {
+    fn test_bitor_dot() {
         let mut dvv: Dvv<i32, String> = Dvv::new(1234);
 
         dvv |= (Dot::new(1234, 0), "Bob".to_string());
@@ -146,6 +153,27 @@ mod tests {
         assert_eq!(2, dvv.values.len());
 
         dvv |= (Dot::new(1234, 2), "Michelle".to_string());
+        assert_eq!(4, dvv.dot.counter);
+        assert_eq!(2, dvv.values.len());
+    }
+
+    #[test]
+    fn test_bitor_counter() {
+        let mut dvv: Dvv<i32, String> = Dvv::new(1234);
+
+        dvv |= (0, "Bob".to_string());
+        assert_eq!(1, dvv.dot.counter);
+        assert_eq!(1, dvv.values.len());
+
+        dvv |= (0, "Sue".to_string());
+        assert_eq!(2, dvv.dot.counter);
+        assert_eq!(2, dvv.values.len());
+
+        dvv |= (1, "Rita".to_string());
+        assert_eq!(3, dvv.dot.counter);
+        assert_eq!(2, dvv.values.len());
+
+        dvv |= (2, "Michelle".to_string());
         assert_eq!(4, dvv.dot.counter);
         assert_eq!(2, dvv.values.len());
     }
