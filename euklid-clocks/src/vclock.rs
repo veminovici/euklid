@@ -204,8 +204,17 @@ impl<A: Ord> FromIterator<A> for VClock<A> {
             .into_iter()
             .map(|a| (a, 0u64))
             .collect::<Vec<(A, u64)>>();
+
         Self {
             dots: BTreeMap::<A, u64>::from_iter(xs),
+        }
+    }
+}
+
+impl<A: Ord> FromIterator<(A, u64)> for VClock<A> {
+    fn from_iter<T: IntoIterator<Item = (A, u64)>>(iter: T) -> Self {
+        Self {
+            dots: BTreeMap::<A, u64>::from_iter(iter),
         }
     }
 }
@@ -246,12 +255,24 @@ mod tests {
     #[quickcheck]
     fn test_from_iter(len: usize) -> bool {
         let len = len % 100;
-        let mut actors = Vec::new();
+        let mut actors = Vec::with_capacity(len);
         for i in 0..len {
             actors.push(i as i32);
         }
 
         let vc = VClock::<i32>::from_iter(actors);
+        vc.len() == len
+    }
+
+    #[quickcheck]
+    fn test_from_pairs(len: usize) -> bool {
+        let len = len % 100;
+        let mut pairs = Vec::with_capacity(len);
+        for i in 0..len {
+            pairs.push((i as i32, (i + 10) as u64));
+        }
+
+        let vc = VClock::<i32>::from_iter(pairs);
         vc.len() == len
     }
 
