@@ -56,10 +56,15 @@ impl<A: Clone + Ord> GCounter<A> {
 }
 
 impl<A: Copy + Ord> GCounter<A> {
+    /// Increments the value for a given actor with a given step.
+    pub fn step(&mut self, actor: &A, s: u64) {
+        let dot = self.counters.dot(actor).step(s);
+        self.merge_dot(dot);
+    }
+
     /// Increments the value for a given actor.
     pub fn incr(&mut self, actor: &A) {
-        let dot = self.counters.dot(actor).incr();
-        self.merge_dot(dot);
+        self.step(actor, 1);
     }
 }
 
@@ -242,6 +247,13 @@ mod tests {
         gc.merge_dot(Dot::new(2, 20));
         assert_eq!(gc.counters.len(), 2);
         assert_eq!(gc.value(), 30);
+    }
+
+    #[test]
+    fn test_step() {
+        let mut a = GCounter::<i32>::from_iter([(1, 10), (2, 0), (3, 20)]);
+        a.step(&1, 5);
+        assert_eq!(10 + 5 + 20, a.value());
     }
 
     #[test]
