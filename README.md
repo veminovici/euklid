@@ -163,6 +163,27 @@ a |= b;
 assert_eq!(a.value(), 10 + 5 + 20);
 ```
 
+### 2.5. PNCounter
+The create **PnCOunter** structure is an implementation of the **pn-counter** CRDT.
+
+```rust
+use euklid_clocks::*;
+use std::iter::FromIterator;
+
+let mut pnc = PnCounter::<i32>::new();
+
+// Actor '1' increments the counter by 20.
+pnc.apply_op(PnCounterOp::Incr(Dot::new(1, 20)));
+assert_eq!(pnc.increments.len(), 1);
+assert_eq!(pnc.value(), 20);
+
+// Actor '2' decrements the counter by 10.
+pnc.apply_op(PnCounterOp::Decr(Dot::new(2, 10)));
+assert_eq!(pnc.decrements.len(), 1);
+
+assert_eq!(pnc.value(), 20 - 10);
+```
+
 ## 3. Resources
 - [Vector Clocks Revisited](https://riak.com/posts/technical/vector-clocks-revisited/index.html?p=9545.html)
 - [Vector Clocks Revisited Part2: Dotted Version Vectors](https://riak.com/posts/technical/vector-clocks-revisited-part-2-dotted-version-vectors/index.html)
