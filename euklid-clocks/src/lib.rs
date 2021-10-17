@@ -1,5 +1,4 @@
 //! A rust library for CRDT clocks.
-
 #![deny(missing_docs)]
 #![deny(unreachable_pub)]
 
