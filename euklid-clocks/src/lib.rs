@@ -5,6 +5,7 @@
 
 mod causalord;
 mod dot;
+mod dvv;
 mod vclock;
 
 /// An operation based CRDT.
@@ -26,4 +27,5 @@ pub trait CvRDT {
 
 pub use crate::causalord::*;
 pub use crate::dot::Dot;
+pub use crate::dvv::Dvv;
 pub use crate::vclock::*;

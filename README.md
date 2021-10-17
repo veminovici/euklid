@@ -77,7 +77,8 @@ let mut dot3 = dot2 + 1;
 dot3 += 10;
 println!("dot3={:?}", dot3);
 ```
-More examples can be found in the [example](https://github.com/veminovici/euklid/blob/main/examples/dot.rs) file.
+
+For a full example go to the [clock_dot.rs](https://github.com/veminovici/euklid/blob/main/euklid-clocks/examples/clock_dot.rs) file.
 
 <br/>
 
@@ -118,57 +119,26 @@ assert_eq!(30, v1.counter(&3));
 assert_eq!(0, v1.counter(&4));
 ```
 
-More examples can be found in the [example](https://github.com/veminovici/euklid/blob/main/examples/vclock.rs) file.
+For a full example go to the [clock_vec.rs](https://github.com/veminovici/euklid/blob/main/euklid-clocks/examples/clock_vec.rs) file.
 
 <br/>
 
-### GCounter
-The [GCounter](https://github.com/veminovici/euklid/blob/main/src/gcounter.rs) is implementing a grow-only counter.
+### Dottet-Vector-Value
+The crate exposes **Dvv** structure which is an implementation of a dotted-vector-value.
+
 ```rust
-extern crate euklid;
-use euklid::{Dot, GCounter};
+use euklid_clocks::*;
 
-// Create a vclock and increment the counter for user A.
-let mut a = VGounter::new();
+let mut srv_dvv: Dvv<i32, String> = Dvv::new(1234); // Create a dvv on server '1234'
 
-// Increment the counter for actor A
-a.inc("A");
+let mut cy_dot = srv_dvv.dot; // the client gets the dot from the server
+let msg = (cy_dot, "Bob".to_string()); // server receives from a client the 'bob' value.
+srv_dvv.merge(&msg.0, &msg.1); // server merges the received value.
 
-// Increment the counter for actor B
-a.inc("B");
-
-// Increase the counter for actor A by 5
-a.stepup("A", 5);
+println!("srv_ddv {:?}", srv_dvv);
 ```
-More examples can be found in the [example](https://github.com/veminovici/euklid/blob/main/examples/gcounter.rs) file.
 
-<br/>
-
-### PNCounter
-The [PNCounter](https://github.com/veminovici/euklid/blob/main/src/pncounter.rs) is implementing a pn-counter.
-```rust
-extern create euklid;
-use euklid::{PNCounter};
-
-// Build a new pncounter
-let mut a = PNCounter::new();
-
-// Increment the counter value
-a.inc("A");
-
-// Increase the counter value by 5.
-a.step_up("A", 5));
-
-// Decrement the value
-a.decr("A");
-
-// Decrease the counter value by 2
-a.step_down("A", 2);
-
-// The counter value should be 3 by now.
-assert_eq!(a.counter(), 3);
-```
-More examples can be found in the [example](https://github.com/veminovici/euklid/blob/main/examples/pncounter.rs) file.
+For a full example go to the [clock_dvv.rs](https://github.com/veminovici/euklid/blob/main/euklid-clocks/examples/clock_dvv.rs) file.
 
 <br/>
 
@@ -184,6 +154,8 @@ More examples can be found in the [example](https://github.com/veminovici/euklid
 - [rust-crdt](https://github.com/rust-crdt/rust-crdt)
 - [Rust code coverage](https://eipi.xyz/blog/rust-code-coverage-with-github-workflows/)
 - [Github workflows for Rust](https://eipi.xyz/blog/github-workflows-to-do-useful-things-with-rust/)
+
+<br/>
 
 ### Thank you!!!
 

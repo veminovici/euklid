@@ -1,35 +1,7 @@
 use euklid_clocks::*;
-use std::fmt::Debug;
-
-struct DVValue<A, T> {
-    dot: Dot<A>,
-    values: Vec<(Dot<A>, T)>,
-}
-
-impl<A, T> DVValue<A, T> {
-    pub fn new(actor: A) -> Self {
-        DVValue {
-            dot: Dot::new(actor, 0),
-            values: Vec::new(),
-        }
-    }
-}
-
-impl<A: Debug, T: Debug> std::fmt::Debug for DVValue<A, T> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "dot={:?} vs={:?}", self.dot, self.values)
-    }
-}
-
-impl<A: Copy + PartialOrd, T: Clone> DVValue<A, T> {
-    pub fn merge(&mut self, dot: &Dot<A>, v: &T) {
-        self.dot.apply_inc_op();
-        self.values.retain(|(d, _)| !dot.is_descendant(d));
-        self.values.push((self.dot, v.clone()));
-    }
-}
 
 // https://riak.com/posts/technical/vector-clocks-revisited-part-2-dotted-version-vectors/index.html
+
 fn main() {
     //
     // INIT
@@ -37,12 +9,8 @@ fn main() {
 
     // Servers '100' starts with an initial dot and an empty DVV.
     let sid = 100;
-    let mut srv_dvv: DVValue<i32, String> = DVValue::new(sid);
+    let mut srv_dvv: Dvv<i32, String> = Dvv::new(sid);
     println!("S0: srv_ddv {:?}", srv_dvv);
-
-    // let mut srv_dot = Dot::new(sid, 0);
-    // let mut srv_dvvs: Vec<(Dot<i32>, String)> = Vec::new();
-    // println!("T0: srv: dot={:?} ddvs={:?}", srv_dot, srv_dvvs);
 
     // client X gets the dot from the server
     let mut cx_dot = srv_dvv.dot;
