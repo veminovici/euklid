@@ -3,3 +3,4 @@
 #![deny(unreachable_pub)]
 
 pub mod identities;
+pub mod ops;
