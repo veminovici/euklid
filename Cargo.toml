@@ -1,5 +1,6 @@
 [workspace]
 members = [
     "euklid-clocks",
+    "euklid-kmerge",
     "euklid-num",
 ]
