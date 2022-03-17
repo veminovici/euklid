@@ -3,8 +3,6 @@
 Just another rust crate, this one implements CRDTs things.
 
 [![CI Pipeline](https://github.com/veminovici/euklid/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/veminovici/euklid/actions/workflows/ci.yml)
-[![codecov](https://codecov.io/gh/veminovici/euklid/branch/main/graph/badge.svg?token=IKPMJE7FHB)](https://codecov.io/gh/veminovici/euklid)
-[![Coverage Status](https://coveralls.io/repos/github/veminovici/euklid/badge.svg)](https://coveralls.io/github/veminovici/euklid)
 [![Tag](https://img.shields.io/github/tag/veminovici/euklid)](https://github.com/veminovici/euklid)
 [![Last commit](https://img.shields.io/github/last-commit/veminovici/euklid)](https://github.com/veminovici/euklid)
 [![Repo size](https://img.shields.io/github/repo-size/veminovici/euklid)](https://github.com/veminovici/euklid)
