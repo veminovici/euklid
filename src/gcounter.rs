@@ -69,8 +69,8 @@ impl<A: Actor, C: Counter + Into<usize>> CRDT for GCounter<A, C> {
     fn value(&self) -> Self::Output {
         self.vclock
             .iter()
-            .map(|(_, counter)| {
-                let c: usize = counter.into();
+            .map(|dot| {
+                let c: usize = dot.counter.into();
                 c
             })
             .sum()

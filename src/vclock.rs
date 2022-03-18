@@ -2,6 +2,7 @@ use std::collections::{btree_map, BTreeMap};
 use std::convert::Infallible;
 use std::fmt::{Debug, Display};
 use std::ops::AddAssign;
+use itertools::Itertools;
 
 use crate::{Actor, CausalityOrd, CmRDT, Counter, CvRDT, Dot, DotRange, UpdateAssign};
 
@@ -58,13 +59,11 @@ impl<A: Actor, C: Counter> From<Vec<(A, C)>> for VClock<A, C> {
 
 impl<A: Actor + Display, C: Counter + Display> Display for VClock<A, C> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+
+        let dots = self.dots.iter().map(|(a,c)| format!("{}:{}", *a, *c)).join(",");
+
         write!(f, "<")?;
-        for (i, (actor, count)) in self.dots.iter().enumerate() {
-            if i > 0 {
-                write!(f, ", ")?;
-            }
-            write!(f, "{}:{}", actor, count)?;
-        }
+        write!(f, "{}", dots)?;
         write!(f, ">")
     }
 }
@@ -166,12 +165,12 @@ impl<A: Actor, C: Counter> VClock<A, C> {
     }
 
     /// Returns an iterator over the dots in this vclock
-    pub fn iter(&self) -> impl Iterator<Item = (&A, C)> {
-        self.dots.iter().map(|(a, c)| (a, *c))
+    pub fn iter(&self) -> impl Iterator<Item = Dot<A, C>> + '_ {
+        self.dots.iter().map(|(a, c)| Dot::new(*a, *c))
     }
 
     fn get_counter_or(&self, default: C, actor: &A) -> C {
-        *self.dots.get(actor).clone().unwrap_or(&default)
+        *self.dots.get(actor).unwrap_or(&default)
     }
 
     fn get_counter_or_zero(&self, actor: &A) -> C {
@@ -415,7 +414,7 @@ mod tests {
     #[test]
     fn test_iter() {
         let clock: VClock<i8, i32> = vec![(1, 10), (2, 20), (3, 30)].into();
-        let ttl = clock.iter().map(|(_, counter)| counter).sum();
+        let ttl = clock.iter().map(|dot| dot.counter).sum();
         assert_eq!(60, ttl);
     }
 
